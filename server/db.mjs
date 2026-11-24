@@ -308,3 +308,11 @@ export function sourceLastFetch() {
   for (const r of rows) { try { out[r.k.slice(4)] = JSON.parse(r.v); } catch {} }
   return out;
 }
+
+/* item tayang yang lama tidak diverifikasi → masuk antrean cek ulang */
+export function staleForReverify(hours = 24, limit = 8) {
+  const cutoff = new Date(Date.now() - hours * 3600e3).toISOString();
+  return db.prepare(
+    "SELECT slug, source_url, tier FROM pwk_katalog WHERE status IN ('published','expired') AND source_url <> '' AND last_verified_at < ? ORDER BY last_verified_at ASC LIMIT ?"
+  ).all(cutoff, limit);
+}

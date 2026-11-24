@@ -2,7 +2,7 @@ import { CFG } from "../config.mjs";
 import {
   stateGet, stateSet, startRun, updateRun, addCandidate, nextCandidates, markCandidate,
   getPageHash, savePage, getPendingPages, markExtracted, startRun as _s, expireOld,
-  getPagesByUrl, addManualCandidate,
+  getPagesByUrl, addManualCandidate, staleForReverify,
 } from "../db.mjs";
 import { loadSources, discoverFromSource, fetchDocument, tierOf } from "./sources.mjs";
 import { extractFromText } from "./extract.mjs";
@@ -48,6 +48,16 @@ async function discoverStep(stats) {
     }
   }
   stateSet("src:last", last);
+}
+
+// sekali per 12 jam: masukkan kembali item lama supaya tenggatnya dicek ulang
+function requeueForReverify(stats) {
+  const lastAt = stateGet("reverify:at", 0);
+  if (Date.now() - Date.parse(lastAt || 0) < 12 * 3600e3) return;
+  const stale = staleForReverify(24, 8);
+  for (const row of stale) addManualCandidate(row.source_url, row.tier, "reverify");
+  stateSet("reverify:at", new Date().toISOString());
+  if (stale.length) stats.errors.push({ stage: "reverify", queued: stale.length });
 }
 
 async function fetchStep(stats, deadline) {
@@ -154,6 +164,7 @@ export async function runPipeline({ trigger = "api", budgetMs = CFG.stepBudgetMs
 
   try {
     await discoverStep(stats);
+    requeueForReverify(stats);
     await fetchStep(stats, deadline);
     await extractStep(stats, deadline);
     const expired = expireOld();

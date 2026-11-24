@@ -1,5 +1,5 @@
 import { slugify, similarity } from "./text.mjs";
-import { listKatalog, upsertItem, setStatus, slugBySource } from "../db.mjs";
+import { listKatalog, upsertItem, setStatus } from "../db.mjs";
 import { CFG } from "../config.mjs";
 
 export function resolveStatus(item, verdict, { tier, url, sourceUrl }) {
@@ -51,16 +51,13 @@ export function publishItem({ item, tier, url, evidence, sourceName, kind, image
 }
 
 function uniqueSlug(name, url) {
-  const existingSlug = slugBySource(url);
-  if (existingSlug) return existingSlug;
   const base = slugify(name) || "item";
-  const existing = listKatalog({ status: "published" })
-    .concat(listKatalog({ status: "draft" }), listKatalog({ status: "expired" }))
-    .find((x) => x.slug === base);
-  if (!existing) return base;
-  if (existing.source_url === url) return base;
-  const suffix = Buffer.from(url).toString("base64url").slice(-6).toLowerCase();
-  return `${base}-${suffix}`;
+  const all = listKatalog({ status: "published" })
+    .concat(listKatalog({ status: "draft" }), listKatalog({ status: "expired" }));
+  // satu artikel kadang memuat beberapa program; slug harus per program, bukan per URL
+  const sameName = all.find((x) => x.slug === base || similarity(x.n, name) >= 0.9);
+  if (sameName) return sameName.slug;
+  return base;
 }
 
 export { setStatus };
