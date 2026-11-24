@@ -153,7 +153,7 @@ h2 { font-size: 1.12rem; text-transform: uppercase; letter-spacing: 0.06em; }
   border-bottom: 3px solid var(--gold);
   box-shadow: 0 6px 24px -18px #000;
 }
-.nav-in { display: flex; align-items: center; gap: 18px; height: var(--nav); }
+.nav-in { display: flex; align-items: center; gap: 18px; height: var(--nav); padding: 0 18px; }
 .brand { display: flex; align-items: center; gap: 11px; color: #fff; text-decoration: none; }
 .brand .bt { font-weight: 800; font-size: 0.98rem; letter-spacing: 0.02em; white-space: nowrap; }
 .brand .bt::after {
@@ -475,7 +475,7 @@ h1 em { font-style: normal; color: var(--gold); }
 
 .st { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em; padding: 4px 10px; border-radius: var(--pill); }
 .st.buka { background: color-mix(in srgb, #12805c 14%, transparent); color: #0f6b4d; }
-.st.segera { background: color-mix(in srgb, var(--gold) 34%, transparent); color: #7a5c00; }
+.st.segera { background: var(--gold); color: #3a2c00; border: 1px solid color-mix(in srgb, var(--gold) 55%, #8a6d00); }
 .st.belum { background: color-mix(in srgb, var(--navy) 13%, transparent); color: var(--navy); }
 .st.ditutup { background: color-mix(in srgb, var(--slate) 18%, transparent); color: var(--slate-deep); }
 .st.tbd { background: transparent; border: 1.2px dashed color-mix(in srgb, var(--slate) 45%, transparent); color: var(--slate-deep); }
@@ -562,13 +562,44 @@ h1 em { font-style: normal; color: var(--gold); }
 .side {
   position: sticky;
   top: calc(var(--nav) + 16px);
+  max-height: calc(100dvh - var(--nav) - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--slate) 45%, transparent) transparent;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--r);
-  overflow: hidden;
   box-shadow: var(--shadow-sm);
 }
-@media (max-width: 900px) { .side { position: static; } }
+.side::-webkit-scrollbar { width: 8px; }
+.side::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--slate) 40%, transparent); border-radius: 8px; }
+
+/* tombol buka filter hanya untuk layar sempit */
+.ftoggle {
+  display: none;
+  width: 100%;
+  margin: 14px 0 0;
+  padding: 12px 16px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  font: inherit;
+  font-weight: 800;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--navy);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+@media (max-width: 900px) {
+  .side { position: static; max-height: none; overflow: visible; }
+  .ftoggle { display: flex; }
+  .side:not(.open) { display: none; }
+}
 
 .pnl { display: flex; flex-direction: column; }
 .ph {
@@ -985,11 +1016,19 @@ footer { background: linear-gradient(135deg, var(--navy-deep), var(--navy)); }
 /* nav dua baris di ponsel: logo di atas, menu di bawah */
 @media (max-width: 700px) {
   :root { --nav: 86px; }
-  .nav-in { flex-wrap: wrap; height: auto; padding: 8px 0 6px; gap: 6px; }
+  .nav-in { flex-wrap: wrap; height: auto; padding: 10px 16px 8px; gap: 6px; }
   .brand { gap: 9px; }
   .badge.sm { width: 36px; height: 36px; }
   .links { flex: 1 0 100%; width: 100%; margin-left: 0; justify-content: space-between; gap: 2px; overflow: visible; }
   .links a { padding: 7px 5px; font-size: 0.63rem; letter-spacing: 0.04em; }
   .links { padding-right: 2px; }
   .side, .dside { top: auto; }
+}
+
+/* tab bulan: gulir halus tanpa scrollbar yang mengganggu */
+.mtabs { scrollbar-width: none; scroll-snap-type: x proximity; }
+.mtabs::-webkit-scrollbar { display: none; }
+@media (max-width: 700px) {
+  .mtabs > * { scroll-snap-align: start; }
+  .mtabs button, .mtabs .tab, .mtabs a { padding: 6px 9px; font-size: 0.64rem; }
 }
