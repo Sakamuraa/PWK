@@ -80,6 +80,49 @@ function h<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Record<string, 
 }
 const safeUrl = (u: string): string | null => { try { const x = new URL(u); return x.protocol === "https:" ? x.href : null; } catch { return null; } };
 const linkOf = (x: Item): string => (x.u && safeUrl(x.u)) || "https://www.google.com/search?q=" + encodeURIComponent(x.n + " pendaftaran resmi");
+// Slug untuk tautan detail yang bisa dibagikan: #item/<slug>
+const slugOf = (n: string): string => n.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+const BYSLUG = new Map<string, Item>(DATA.map(x => [slugOf(x.n), x]));
+const utc = (t: number): string => new Date(t).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+const icsEsc = (s: string): string => s.replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+// Rentang kalender: mulai dari tanggal buka bila ada, kalau tidak sehari sebelum tenggat.
+function rangeOf(x: Item): [number, number] | null {
+  if (!x.dl) return null;
+  const end = toTime(x.dl, true);
+  return [x.op ? toTime(x.op, false) : end - DAY, end];
+}
+function icsOf(x: Item): string | null {
+  const r = rangeOf(x);
+  if (!r) return null;
+  const stamp = utc(Date.now());
+  const lines = [
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//PWK HMTI FT-UMB//Katalog Lomba Beasiswa//ID", "CALSCALE:GREGORIAN",
+    "BEGIN:VEVENT", "UID:" + slugOf(x.n) + "-" + stamp + "@pwk-hmti", "DTSTAMP:" + stamp,
+    "DTSTART:" + utc(r[0]), "DTEND:" + utc(r[1]),
+    "SUMMARY:" + icsEsc(x.n + " - pendaftaran ditutup"),
+    "DESCRIPTION:" + icsEsc(x.d + " | " + (x.u || "cari jadwal resmi di Google")),
+    "URL:" + linkOf(x), "END:VEVENT", "END:VCALENDAR",
+  ];
+  return lines.join("\r\n") + "\r\n";
+}
+function gcalOf(x: Item): string | null {
+  const r = rangeOf(x);
+  if (!r) return null;
+  return "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+    "&text=" + encodeURIComponent(x.n + " - pendaftaran ditutup") +
+    "&dates=" + utc(r[0]) + "/" + utc(r[1]) +
+    "&details=" + encodeURIComponent(x.d + " | " + x.o) + "&location=" + encodeURIComponent(x.o);
+}
+function downloadIcs(x: Item): void {
+  const body = icsOf(x);
+  if (!body) return;
+  const url = URL.createObjectURL(new Blob([body], { type: "text/calendar;charset=utf-8" }));
+  const a = h("a", { href: url, download: slugOf(x.n) + ".ics" });
+  document.body.append(a);
+  a.click();
+  a.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 3000);
+}
 const isStrArr = (v: unknown): v is string[] => Array.isArray(v) && v.every(s => typeof s === "string");
 function load<T>(key: string, ok: (v: unknown) => v is T, fallback: T): T {
   try { const raw = localStorage.getItem(key); if (!raw) return fallback; const v: unknown = JSON.parse(raw); return ok(v) ? v : fallback; } catch { return fallback; }
@@ -158,6 +201,7 @@ const STAT = [
   { id: "S3", label: "Lulusan S2 (cari S3)", target: "S3", lulus: true },
 ];
 let view: Route = "beranda", mode: "biasa" | "layak" = "biasa", eligRun = false;
+let detail: Item | null = null;
 const YEAR0 = yearWib();
 const st: Filter = { q: "", jenis: new Set(), tingkat: new Set(), jenjang: new Set(), bidang: new Set(), status: new Set(), only: new Set(), year: YEAR0, month: 0 };
 const saved = new Set<string>(load("tiSaved", isStrArr, []));
@@ -174,7 +218,7 @@ function card(x: Item, why: Why[] = []): HTMLElement {
   const on = saved.has(x.n), k = x.j.toLowerCase(), ss = statusOf(x);
   return h("article", { class: "card " + k + (ss.s === "ditutup" ? " closed" : "") },
     h("div", { class: "tags" }, h("span", { class: "st " + ss.s }, STLABEL[ss.s]), h("span", { class: "tag " + k }, x.j), h("span", { class: "tag" }, x.t), h("span", { class: "tag" }, x.b), x.jen ? h("span", { class: "tag" }, x.jen) : null),
-    h("h3", {}, x.n), h("p", { class: "org" }, x.o), h("p", { class: "desc" }, x.d),
+    h("h3", {}, h("a", { href: "#item/" + slugOf(x.n) }, x.n)), h("p", { class: "org" }, x.o), h("p", { class: "desc" }, x.d),
     why.length ? h("ul", { class: "why" }, ...why.map(w => h("li", { class: w.v }, w.t))) : null,
     ss.s === "ditutup" ? h("p", { class: "closedn" }, "Periode ini sudah lewat. Cek situs resmi untuk periode berikutnya.") : null,
     h("div", { class: "cf" }, h("span", { class: "dt" + (ss.s === "segera" ? " hot" : "") }, dateInfo(x, ss)),
@@ -190,7 +234,7 @@ function row(x: Item, why: Why[] = []): HTMLElement {
     h("div", { class: "rl" }, h("div", { class: "dots" }, ...labels.map(l => h("span", { class: "dot " + k }, l))),
       h("div", { class: "dts" }, h("span", {}, "Mulai:"), h("span", {}, x.op ? fmtDate(x.op, false) : "-"), h("span", { class: "dlx " + ss.s }, "Deadline:"), h("span", { class: "dlx " + ss.s }, x.dl ? fmtDate(x.dl) : "Belum diverifikasi"))),
     h("div", { class: "rr" },
-      h("div", { class: "rt" }, h("a", { class: "rn", href: linkOf(x), target: "_blank", rel: "noopener noreferrer" }, x.n),
+      h("div", { class: "rt" }, h("a", { class: "rn", href: "#item/" + slugOf(x.n) }, x.n),
         h("button", { class: "bm" + (on ? " on" : ""), type: "button", "data-s": x.n, "aria-pressed": String(on), "aria-label": (on ? "Hapus dari tersimpan: " : "Simpan: ") + x.n }, icon("bookmark"))),
       h("p", { class: "rs" }, x.o + " \u00b7 " + x.t + " \u00b7 " + x.b),
       h("p", { class: "rd" }, x.d),
@@ -231,7 +275,8 @@ const vBeranda = h("section", {},
       hs,
       h("div", { class: "stats" }, stat(DATA.filter(x => x.j === "Lomba" && isLive(x)).length, "lomba aktif"), stat(DATA.filter(x => x.j === "Beasiswa" && isLive(x)).length, "beasiswa aktif"), stat(DATA.filter(x => x.t === "Internasional" && isLive(x)).length, "internasional")))),
   h("div", { class: "wrap" }, sech("Lomba pilihan", "Ajang nasional untuk mahasiswa.", "lomba", "Lihat semua lomba"), hl, sech("Beasiswa luar negeri", "Studi lanjut di luar negeri.", "beasiswa", "Lihat semua beasiswa"), hb,
-    h("div", { class: "arcnote" }, h("p", {}, "Info yang tenggatnya sudah lewat otomatis ditandai ditutup dan dipindahkan ke arsip, jadi yang tampil di sini selalu yang masih bisa didaftar."), h("a", { href: "#arsip" }, "Buka arsip"))));
+    h("div", { class: "arcnote" }, h("p", {}, "Info yang tenggatnya sudah lewat otomatis ditandai ditutup dan dipindahkan ke arsip, jadi yang tampil di sini selalu yang masih bisa didaftar."), h("a", { href: "#arsip" }, "Buka arsip")),
+    h("p", { class: "srcnote" }, DATA.filter(x => !x.dl).length + " dari " + DATA.length + " info belum punya tanggal resmi yang bisa diverifikasi, jadi statusnya tidak dihitung otomatis. Tanggalnya dicek manual dari situs penyelenggara.")));
 
 // Katalog + cek kelayakan
 const ptitle = h("h1"), pdesc = h("p");
@@ -293,9 +338,72 @@ const arcList = h("div", {});
 const vArsip = h("section", {},
   h("div", { class: "phead" }, h("div", { class: "wrap" }, h("h1", {}, ROUTES.arsip[0]), h("p", {}, ROUTES.arsip[1]))),
   h("div", { class: "wrap" },
-    h("p", { class: "alert" }, "Arsip terisi otomatis dari tanggal tenggat (WIB), tanpa perlu ubah status manual. Tombol pendaftaran dinonaktifkan karena periodenya sudah berakhir."),
+    h("p", { class: "alert" }, "Arsip terisi otomatis dari tanggal tenggat (WIB), tanpa perlu ubah status manual. Tombol pendaftaran dinonaktifkan karena periodenya sudah berakhir. Info yang belum punya tanggal resmi tidak masuk arsip."),
     h("div", { class: "arcbar" }, h("span", { class: "fl" }, "Jenis"), arcChips, arcCount),
     arcList));
+
+// Detail item: #item/<slug>. Satu halaman per info, bisa dibagikan lewat tautan.
+const dCur = h("span"), dTitle = h("h1"), dSub = h("p"), dTags = h("div", { class: "dtags" });
+const dBody = h("div"), dSide = h("aside", { class: "dside" });
+const vDetail = h("section", { hidden: "" },
+  h("div", { class: "phead dphead" }, h("div", { class: "wrap" },
+    h("div", { class: "crumbs" }, h("a", { href: "#beranda" }, "Beranda"), h("span", {}, "/"), h("a", { href: "#cari" }, "Katalog"), h("span", {}, "/"), dCur),
+    dTitle, dSub, dTags)),
+  h("div", { class: "wrap" }, h("div", { class: "dwrap" }, dBody, dSide)));
+
+function fact(label: string, value: string): HTMLElement[] { return [h("b", {}, label), h("span", {}, value)]; }
+function paintDetail(x: Item): void {
+  const ss = statusOf(x), on = saved.has(x.n), k = x.j.toLowerCase(), r = rangeOf(x);
+  dCur.textContent = x.n;
+  dTitle.textContent = x.n;
+  dSub.textContent = x.o + " \u00b7 " + x.t + " \u00b7 " + x.b;
+  const tags: (Node | null)[] = [h("span", { class: "st " + ss.s }, STLABEL[ss.s]), h("span", { class: "tag " + k }, x.j), h("span", { class: "tag" }, x.t), h("span", { class: "tag" }, x.b)];
+  if (x.jen) tags.push(h("span", { class: "tag" }, x.jen));
+  dTags.replaceChildren(...(tags.filter(Boolean) as Node[]));
+
+  const jadwal: HTMLElement[] = [];
+  if (x.op) jadwal.push(h("li", {}, h("b", {}, "Pendaftaran dibuka: "), fmtDate(x.op, false)));
+  if (x.dl) jadwal.push(h("li", {}, h("b", {}, "Tenggat: "), fmtDate(x.dl) + (x.dl.length === 10 ? " pukul 23.59 WIB" : "")));
+  if (x.tg) jadwal.push(h("li", {}, h("b", {}, "Catatan: "), x.tg));
+  if (!jadwal.length) jadwal.push(h("li", {}, "Jadwal resmi belum diumumkan. Buka situs penyelenggara untuk tanggal terbaru."));
+
+  const sy: string[] = [];
+  if (x.jen) sy.push("Jenjang: " + x.jen);
+  const q = x.req;
+  if (q) {
+    if (q.lulusS1) sy.push("Sudah lulus S1 dan punya ijazah");
+    if (q.ipkMin !== undefined) sy.push("IPK minimal " + q.ipkMin.toFixed(2) + " (skala 4)");
+    if (q.semMin !== undefined && q.semMax !== undefined) sy.push("Semester " + q.semMin + " sampai " + q.semMax);
+    else if (q.semMin !== undefined) sy.push("Minimal semester " + q.semMin);
+    else if (q.semMax !== undefined) sy.push("Maksimal semester " + q.semMax);
+    if (q.kerjaMin !== undefined) sy.push("Pengalaman kerja minimal " + q.kerjaMin + " tahun");
+    if (q.ekonomi) sy.push("Diperuntukkan bagi yang butuh bantuan biaya");
+  }
+
+  const rel = DATA.filter(y => y !== x && isLive(y) && (y.b === x.b || y.j === x.j)).sort(byStatus).slice(0, 3);
+  dBody.replaceChildren(
+    h("div", { class: "dsec" }, h("h2", {}, "Tentang"), h("p", {}, x.d)),
+    h("div", { class: "dsec" }, h("h2", {}, "Jadwal"), h("ul", {}, ...jadwal)),
+    h("div", { class: "dsec" }, h("h2", {}, "Syarat indikatif"),
+      sy.length ? h("ul", {}, ...sy.map(t => h("li", {}, t))) : h("p", {}, "Syarat rinci belum diinput PWK. Buka pedoman resmi penyelenggara."),
+      h("p", { class: "dt" }, "Syarat bisa berubah tiap periode. Cocokkan lagi dengan pedoman resmi sebelum mendaftar.")),
+    rel.length ? h("div", { class: "dsec" }, h("h2", {}, "Info terkait"), h("div", { class: "drel" }, ...rel.map(y => card(y)))) : h("div", {}));
+
+  const bm = h("button", { class: "btn" + (on ? " saved" : ""), type: "button", "data-s": x.n, "aria-pressed": String(on) }, on ? "Tersimpan" : "Simpan");
+  const cal: HTMLElement[] = [];
+  if (r) {
+    const ics = h("button", { class: "btn", type: "button" }, "Ekspor .ics");
+    ics.addEventListener("click", () => downloadIcs(x));
+    cal.push(h("div", { class: "dact row2x" }, ics, h("a", { class: "btn", href: gcalOf(x) ?? "#", target: "_blank", rel: "noopener noreferrer" }, "Google Calendar")));
+  }
+  dSide.replaceChildren(
+    h("div", { class: "dfact" },
+      ...fact("Penyelenggara", x.o), ...fact("Tingkat", x.t), ...fact("Bidang", x.b),
+      ...fact("Tenggat", x.dl ? fmtDate(x.dl) : "Belum diumumkan"), ...fact("Jenis", x.j)),
+    h("p", { class: "dt" + (ss.s === "segera" ? " hot" : "") }, dateInfo(x, ss)),
+    h("div", { class: "dact" }, cta(x, ss, "Buka situs resmi", "Cari info resmi"), bm, ...cal),
+    h("p", { class: "dt" }, "Selalu cek situs resmi penyelenggara sebelum mendaftar."));
+}
 
 const foot = h("footer", {}, h("div", { class: "wrap" }, h("span", { class: "badge" }, img(HM)), h("span", { class: "pill" }, img(UM)),
   h("p", {}, "Divisi PWK, HMTI Fakultas Teknik, Universitas Mercu Buana. Data hanya penunjuk awal; selalu cek situs resmi penyelenggara. Data diperbarui " + fmtDate(UPDATED) + ".")));
@@ -382,7 +490,8 @@ function paintArsip(): void {
   arcList.replaceChildren(...(out.length ? out : [h("div", { class: "empty" }, "Belum ada arsip. Info yang tenggatnya lewat akan otomatis muncul di sini.")]));
 }
 function paint(): void {
-  navLinks.forEach(a => { if (a.getAttribute("href") === "#" + view) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  navLinks.forEach(a => { if (!detail && a.getAttribute("href") === "#" + view) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  if (detail) { paintDetail(detail); return; }
   if (view === "beranda") {
     fill(hl, DATA.filter(x => x.j === "Lomba" && isLive(x)).sort(byStatus).slice(0, 3), "");
     fill(hb, DATA.filter(x => x.j === "Beasiswa" && x.t === "Internasional" && isLive(x)).sort(byStatus).slice(0, 3), "");
@@ -391,10 +500,13 @@ function paint(): void {
   else paintCat();
 }
 function route(): void {
-  const raw = (location.hash || "#beranda").slice(1);
-  view = isRoute(raw) ? raw : "beranda";
-  vBeranda.hidden = view !== "beranda"; vArsip.hidden = view !== "arsip";
-  vCat.hidden = view === "beranda" || view === "arsip";
+  const raw = decodeURI((location.hash || "#beranda").slice(1));
+  const m = /^item\/(.+)$/.exec(raw);
+  detail = (m && BYSLUG.get(m[1])) || null;
+  if (!detail) view = isRoute(raw) ? raw : "beranda";
+  vDetail.hidden = !detail;
+  vBeranda.hidden = !!detail || view !== "beranda"; vArsip.hidden = !!detail || view !== "arsip";
+  vCat.hidden = !!detail || view === "beranda" || view === "arsip";
   ptitle.textContent = ROUTES[view][0]; pdesc.textContent = ROUTES[view][1];
   if (view === "cari") { eSem.value = sd.sem; eIpk.value = sd.ipk; eKerja.value = sd.kerja; }
   window.scrollTo(0, 0); paint();
@@ -424,7 +536,7 @@ function init(): void {
   yNext.addEventListener("click", () => { st.year = Math.min(YEAR0 + 3, st.year + 1); paint(); });
   hs.addEventListener("submit", e => { e.preventDefault(); st.q = hq.value.trim().slice(0, 100); q.value = st.q; mode = "biasa"; if (location.hash === "#cari") route(); else location.hash = "#cari"; });
   window.addEventListener("hashchange", route);
-  document.getElementById("app")!.replaceChildren(nav, h("main", {}, vBeranda, vCat, vArsip), foot);
+  document.getElementById("app")!.replaceChildren(nav, h("main", {}, vBeranda, vCat, vArsip, vDetail), foot);
   route();
 
   // Status mengikuti jam sebenarnya: dicek ulang tiap menit dan saat tab aktif
@@ -441,5 +553,9 @@ function init(): void {
   window.setInterval(refreshStatus, 60000);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshStatus(); });
   window.addEventListener("focus", refreshStatus);
+  // PWA: aset disimpan di cache agar katalog tetap terbuka saat sinyal jelek.
+  if ("serviceWorker" in navigator && import.meta.env.PROD) {
+    window.addEventListener("load", () => { navigator.serviceWorker.register("/sw.js").catch(() => { /* offline saja tidak aktif */ }); });
+  }
 }
 init();

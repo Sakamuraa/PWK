@@ -1,0 +1,18 @@
+{
+  "name": "Lomba & Beasiswa TI — HMTI FT-UMB",
+  "short_name": "Lomba TI",
+  "description": "Katalog lomba dan beasiswa untuk mahasiswa Teknik Industri, Divisi PWK HMTI FT-UMB.",
+  "start_url": "/#beranda",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F2F4F7",
+  "theme_color": "#173F67",
+  "lang": "id",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
