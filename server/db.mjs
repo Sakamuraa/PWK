@@ -119,8 +119,10 @@ export function rowToItem(r) {
 }
 
 export function listKatalog({ j, t, q, status = "published" } = {}) {
-  const where = ["status = ?"];
-  const args = [status];
+  // status "any" = tayang + arsip, dipakai endpoint publik supaya halaman
+  // Arsip di frontend tetap terisi item yang tenggatnya sudah lewat.
+  const where = status === "any" ? ["status IN ('published','expired')"] : ["status = ?"];
+  const args = status === "any" ? [] : [status];
   if (j) { where.push("json_extract(payload,'$.j') = ?"); args.push(j); }
   if (t) { where.push("json_extract(payload,'$.t') = ?"); args.push(t); }
   const rows = db.prepare(`SELECT * FROM pwk_katalog WHERE ${where.join(" AND ")} ORDER BY last_verified_at DESC`).all(...args);

@@ -86,7 +86,7 @@ const server = http.createServer(async (req, res) => {
     if (p.startsWith("/api/")) res.setHeader("cache-control", "no-store");
 
     if (p === "/api/katalog" && method === "GET") {
-      const items = listKatalog({ j: u.searchParams.get("j") || undefined, t: u.searchParams.get("t") || undefined, q: u.searchParams.get("q") || undefined });
+      const items = listKatalog({ j: u.searchParams.get("j") || undefined, t: u.searchParams.get("t") || undefined, q: u.searchParams.get("q") || undefined, status: "any" });
       return json(res, 200, { updated: newest(items), total: items.length, items }, { "cache-control": "public, max-age=60, s-maxage=300" });
     }
 

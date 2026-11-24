@@ -40,7 +40,7 @@ STEP_BUDGET_MS=210000
 | `/api/admin/refresh` | POST | Bearer `ADMIN_TOKEN` | `{"url":..}` untuk poster IG/Drive, atau tanpa body untuk memicu run |
 | `/api/laporan` | POST | – | `{"slug":..,"pesan":..}`, batas 5/jam per IP |
 
-Pemicu dari cron-job.org: satu job, `POST https://pwk.doomps.web.id/api/cron/discover`, header `Authorization: Bearer <CRON_SECRET>`, jadwal tiap 5 menit. Endpoint menjawab di bawah 1 detik, jadi batas 30 detik cron-job.org tidak pernah tersentuh; kerja berjalan di latar dan dikunci supaya tidak ada dua run bersamaan.
+Pemicu dari cron-job.org: satu job, `POST https://hmti-mercubuana.web.id/api/cron/discover`, header `Authorization: Bearer <CRON_SECRET>`, jadwal tiap 5 menit. Endpoint menjawab di bawah 1 detik, jadi batas 30 detik cron-job.org tidak pernah tersentuh; kerja berjalan di latar dan dikunci supaya tidak ada dua run bersamaan.
 
 ## Pipeline
 
