@@ -91,20 +91,12 @@ h1 em{font-style:normal;color:var(--gold)}
 .btn{font:inherit;font-size:.88rem;font-weight:700;padding:8px 14px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;text-decoration:none;text-align:center}
 .btn.main{flex:1;background:var(--gold);border-color:var(--gold);color:var(--navy-d)}
 .btn.saved{border-color:var(--accent);color:var(--accent)}
+.btn.dis{flex:1;background:var(--line);border-color:var(--line);color:var(--muted);cursor:not-allowed;user-select:none}
 .empty{grid-column:1/-1;text-align:center;padding:44px 12px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:12px}
 
-/* PROFIL */
-.pgrid{display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:24px;margin-top:22px;align-items:start}
-@media(max-width:860px){.pgrid{grid-template-columns:1fr}}
-.pcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:16px}
-.who{display:flex;align-items:center;gap:12px}
-.av{width:54px;height:54px;border-radius:50%;background:var(--navy);color:var(--gold);display:grid;place-items:center;font-weight:900;font-size:1.1rem}
+/* FORM (cek kelayakan) */
 .field{display:flex;flex-direction:column;gap:6px}
 .field label{font-size:.78rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
-.row2{display:grid;grid-template-columns:1fr 110px;gap:10px}
-.toast{font-size:.85rem;color:var(--bea);min-height:1.2em}
-.pcol .sech:first-child{margin-top:0}
-.g1{grid-template-columns:1fr}
 
 /* FOOTER */
 footer{position:relative;z-index:1;background:var(--navy-d);color:#D1D5DB;padding:26px 0 32px;font-size:.88rem;border-top:4px solid var(--gold)}
@@ -113,7 +105,6 @@ footer .badge{width:46px;height:46px}
 footer .pill{padding:6px 14px}footer .pill img{height:24px}
 footer p{margin:0;flex:1;min-width:240px}
 .pnl{display:flex;flex-direction:column;gap:18px}
-.row2b{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .tabs{display:flex;gap:8px;margin-top:22px;flex-wrap:wrap}
 .tab{font:inherit;font-weight:700;padding:9px 18px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer}
 .tab[aria-pressed="true"]{background:var(--pbg);border-color:var(--pbg);color:var(--pfg)}
@@ -187,3 +178,12 @@ footer p{margin:0;flex:1;min-width:240px}
 .dot.lomba{background:var(--gold);color:#111827}
 .hero::after{content:"";position:absolute;right:0;top:0;width:260px;height:100%;background:linear-gradient(115deg,transparent 52%,rgba(100,116,139,.38) 52% 68%,transparent 68% 76%,#FACC15 76% 82%,transparent 82%);pointer-events:none}
 @media(max-width:640px){.hero::after{display:none}}
+
+/* Arsip */
+.arcbar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:22px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.arcbar .dt{margin-left:auto}
+.arcbar .chips{gap:8px}
+.arcnote{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;margin-top:36px;padding:14px 16px;background:var(--panel);border-left:4px solid var(--gold);border-radius:10px}
+.arcnote p{margin:0;font-size:.9rem;color:var(--muted);flex:1;min-width:220px}
+.arcnote a{font-weight:800;color:var(--accent);text-decoration:none;white-space:nowrap}
+.arcnote a:hover{text-decoration:underline}

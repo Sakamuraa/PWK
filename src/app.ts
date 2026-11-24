@@ -5,7 +5,7 @@
 
 type Jenis = "Lomba" | "Beasiswa";
 type Tingkat = "Kampus" | "Nasional" | "Internasional";
-type Route = "beranda" | "cari" | "lomba" | "beasiswa" | "profil";
+type Route = "beranda" | "cari" | "lomba" | "beasiswa" | "arsip";
 type Verdict = "ok" | "cek" | "no";
 type Status = "buka" | "segera" | "belum" | "ditutup" | "tbd";
 interface StInfo { s: Status; n: number }
@@ -21,7 +21,6 @@ interface Item {
   jen?: string;          // jenjang beasiswa
   req?: Req;
 }
-interface Profil { nama: string; nim: string; angkatan: string; semester: string; ipk: string; jenjang: string; minat: string[] }
 interface Filter { q: string; jenis: Set<string>; tingkat: Set<string>; jenjang: Set<string>; bidang: Set<string>; status: Set<string>; only: Set<string>; year: number; month: number }
 interface Student { status: string; sem: string; ipk: string; kerja: string; biaya: boolean; tujuan: string }
 interface Why { v: Verdict; t: string }
@@ -82,10 +81,6 @@ function h<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Record<string, 
 const safeUrl = (u: string): string | null => { try { const x = new URL(u); return x.protocol === "https:" ? x.href : null; } catch { return null; } };
 const linkOf = (x: Item): string => (x.u && safeUrl(x.u)) || "https://www.google.com/search?q=" + encodeURIComponent(x.n + " pendaftaran resmi");
 const isStrArr = (v: unknown): v is string[] => Array.isArray(v) && v.every(s => typeof s === "string");
-const isProfil = (v: unknown): v is Partial<Profil> => {
-  const p = v as Profil;
-  return !!p && typeof p === "object" && typeof p.nama === "string" && typeof p.nim === "string" && typeof p.angkatan === "string" && typeof p.jenjang === "string" && isStrArr(p.minat);
-};
 function load<T>(key: string, ok: (v: unknown) => v is T, fallback: T): T {
   try { const raw = localStorage.getItem(key); if (!raw) return fallback; const v: unknown = JSON.parse(raw); return ok(v) ? v : fallback; } catch { return fallback; }
 }
@@ -111,10 +106,14 @@ function inMonth(x: Item, y: number, m: number): boolean {
 }
 const img = (src: string, alt = ""): HTMLImageElement => { const i = h("img", { alt }); i.src = src; return i; };
 
-/* ---------- status tenggat ---------- */
-// Isi dl (tenggat) hanya dari sumber resmi. Tanpa dl = "Tanggal belum diverifikasi".
+/* ---------- waktu & status tenggat ---------- */
+// Semua perhitungan memakai WIB (UTC+7). NOW diperbarui berkala supaya status
+// berpindah sendiri ke "ditutup" tanpa perlu admin mengubah data.
 const UPDATED = "2026-11-21";   // ubah setiap kali data diperbarui
-const DAY = 86400000, NOW = Date.now();
+const DAY = 86400000, WIB = 7 * 3600000;
+let NOW = Date.now();
+// Tahun berjalan menurut kalender WIB.
+const yearWib = (): number => new Date(NOW + WIB).getUTCFullYear();
 const toTime = (s: string, end: boolean): number => Date.parse(s.length === 10 ? s + (end ? "T23:59:59+07:00" : "T00:00:00+07:00") : s);
 const fmtDate = (s: string, end = true): string => new Date(toTime(s, end)).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Jakarta" });
 const STLABEL: Record<Status, string> = { buka: "Dibuka", segera: "Segera ditutup", belum: "Belum dibuka", ditutup: "Sudah ditutup", tbd: "Tanggal belum diverifikasi" };
@@ -138,6 +137,10 @@ function dateInfo(x: Item, ss: StInfo): string {
 }
 const byStatus = (a: Item, b: Item): number => { const sa = statusOf(a), sb = statusOf(b); return RANK[sa.s] - RANK[sb.s] || sa.n - sb.n; };
 const statusMatch = (f: string, s: Status): boolean => f === "semua" || (f === "aktif" ? s === "buka" || s === "segera" : f === s);
+// Info yang periodenya sudah lewat tidak lagi ditampilkan di beranda.
+const isLive = (x: Item): boolean => statusOf(x).s !== "ditutup";
+const isExpired = (x: Item): boolean => statusOf(x).s === "ditutup";
+const deadlineOf = (x: Item): number => (x.dl ? toTime(x.dl, true) : 0);
 
 /* ---------- state ---------- */
 const ROUTES: Record<Route, [string, string]> = {
@@ -145,10 +148,9 @@ const ROUTES: Record<Route, [string, string]> = {
   cari: ["Cari lomba dan beasiswa", "Cari dengan kata kunci, atau cek beasiswa yang cocok dengan kondisi akademikmu."],
   lomba: ["Info lomba", "Lomba tingkat kampus, nasional, dan internasional."],
   beasiswa: ["Info beasiswa", "Beasiswa dalam dan luar negeri untuk S1 sampai S3."],
-  profil: ["Profil mahasiswa", "Isi data akademik dan minat supaya rekomendasi sesuai kebutuhanmu."],
+  arsip: ["Arsip", "Lomba dan beasiswa yang periode pendaftarannya sudah berakhir."],
 };
 const isRoute = (s: string): s is Route => Object.prototype.hasOwnProperty.call(ROUTES, s);
-const EMPTY: Profil = { nama: "", nim: "", angkatan: "", semester: "", ipk: "", jenjang: "", minat: [] };
 const BID: string[] = Array.from(new Set(DATA.map(x => x.b)));
 const STAT = [
   { id: "S1", label: "Mahasiswa S1", target: "S1", lulus: false },
@@ -156,14 +158,18 @@ const STAT = [
   { id: "S3", label: "Lulusan S2 (cari S3)", target: "S3", lulus: true },
 ];
 let view: Route = "beranda", mode: "biasa" | "layak" = "biasa", eligRun = false;
-const YEAR0 = new Date(NOW).getFullYear();
+const YEAR0 = yearWib();
 const st: Filter = { q: "", jenis: new Set(), tingkat: new Set(), jenjang: new Set(), bidang: new Set(), status: new Set(), only: new Set(), year: YEAR0, month: 0 };
 const saved = new Set<string>(load("tiSaved", isStrArr, []));
-let pf: Profil = { ...EMPTY, ...load<Partial<Profil>>("tiProfil", isProfil, {}) };
-let pw = { jenjang: "", minat: [] as string[] };
-const sd: Student = { status: "S1", sem: pf.semester, ipk: pf.ipk, kerja: "0", biaya: false, tujuan: "Semua" };
+const sd: Student = { status: "S1", sem: "", ipk: "", kerja: "0", biaya: false, tujuan: "Semua" };
 
 /* ---------- komponen ---------- */
+// Tombol pendaftaran hanya aktif selama periode belum lewat. Untuk info yang
+// sudah ditutup, tombol diganti elemen nonaktif supaya tidak bisa diklik.
+function cta(x: Item, ss: StInfo, label: string, alt: string): HTMLElement {
+  if (ss.s === "ditutup") return h("span", { class: "btn dis", "aria-disabled": "true", title: "Pendaftaran periode ini sudah ditutup" }, "Pendaftaran ditutup");
+  return h("a", { class: "btn main", href: linkOf(x), target: "_blank", rel: "noopener noreferrer" }, x.u ? label : alt);
+}
 function card(x: Item, why: Why[] = []): HTMLElement {
   const on = saved.has(x.n), k = x.j.toLowerCase(), ss = statusOf(x);
   return h("article", { class: "card " + k + (ss.s === "ditutup" ? " closed" : "") },
@@ -173,7 +179,7 @@ function card(x: Item, why: Why[] = []): HTMLElement {
     ss.s === "ditutup" ? h("p", { class: "closedn" }, "Periode ini sudah lewat. Cek situs resmi untuk periode berikutnya.") : null,
     h("div", { class: "cf" }, h("span", { class: "dt" + (ss.s === "segera" ? " hot" : "") }, dateInfo(x, ss)),
       h("div", { class: "acts" },
-        h("a", { class: "btn main", href: linkOf(x), target: "_blank", rel: "noopener noreferrer" }, x.u ? "Buka situs resmi" : "Cari info resmi"),
+        cta(x, ss, "Buka situs resmi", "Cari info resmi"),
         h("button", { class: "btn" + (on ? " saved" : ""), type: "button", "data-s": x.n }, on ? "Tersimpan" : "Simpan"))));
 }
 const fill = (host: HTMLElement, rows: Item[], msg: string): void => host.replaceChildren(...(rows.length ? rows.map(x => card(x)) : [h("div", { class: "empty" }, msg)]));
@@ -189,7 +195,7 @@ function row(x: Item, why: Why[] = []): HTMLElement {
       h("p", { class: "rs" }, x.o + " \u00b7 " + x.t + " \u00b7 " + x.b),
       h("p", { class: "rd" }, x.d),
       h("div", { class: "rb" }, h("span", { class: "st " + ss.s }, STLABEL[ss.s]), h("span", { class: "dt" + (ss.s === "segera" ? " hot" : "") }, dateInfo(x, ss)),
-        h("a", { class: "btn main", href: linkOf(x), target: "_blank", rel: "noopener noreferrer" }, x.u ? "Buka portal resmi" : "Cari info resmi (Google)")),
+        cta(x, ss, "Buka portal resmi", "Cari info resmi (Google)")),
       ss.s === "ditutup" ? h("p", { class: "closedn" }, "Periode ini sudah lewat. Cek situs resmi untuk periode berikutnya.") : null,
       why.length ? h("ul", { class: "why" }, ...why.map(w => h("li", { class: w.v }, w.t))) : null));
 }
@@ -204,7 +210,7 @@ function input(id: string, attrs: Record<string, string> = {}): HTMLInputElement
 const field = (label: string, i: HTMLInputElement): HTMLElement => h("div", { class: "field" }, h("label", { for: i.id }, label), i);
 
 /* ---------- kerangka tampilan ---------- */
-const navLinks = ([["beranda", "Beranda"], ["cari", "Cari"], ["lomba", "Info Lomba"], ["beasiswa", "Info Beasiswa"], ["profil", "Profil"]] as [Route, string][]).map(([r, l]) => h("a", { href: "#" + r }, l));
+const navLinks = ([["beranda", "Beranda"], ["cari", "Cari"], ["lomba", "Info Lomba"], ["beasiswa", "Info Beasiswa"], ["arsip", "Arsip"]] as [Route, string][]).map(([r, l]) => h("a", { href: "#" + r }, l));
 const nav = h("nav", { class: "nav", "aria-label": "Menu utama" }, h("div", { class: "wrap nav-in" },
   h("a", { class: "brand", href: "#beranda" }, h("span", { class: "badge sm" }, img(HM, "Logo HMTI")), h("span", { class: "bt" }, "Lomba & Beasiswa TI")),
   h("div", { class: "links" }, ...navLinks)));
@@ -223,8 +229,9 @@ const vBeranda = h("section", {},
       h("h1", {}, "Lomba dan beasiswa untuk ", h("em", {}, "insinyur industri"), " masa depan"),
       h("p", { class: "sub" }, "Satu tempat untuk mencari lomba kampus, nasional, internasional, dan beasiswa dalam maupun luar negeri. Khusus anggota Teknik Industri."),
       hs,
-      h("div", { class: "stats" }, stat(DATA.filter(x => x.j === "Lomba").length, "lomba"), stat(DATA.filter(x => x.j === "Beasiswa").length, "beasiswa"), stat(DATA.filter(x => x.t === "Internasional").length, "internasional")))),
-  h("div", { class: "wrap" }, sech("Lomba pilihan", "Ajang nasional untuk mahasiswa.", "lomba", "Lihat semua lomba"), hl, sech("Beasiswa luar negeri", "Studi lanjut di luar negeri.", "beasiswa", "Lihat semua beasiswa"), hb));
+      h("div", { class: "stats" }, stat(DATA.filter(x => x.j === "Lomba" && isLive(x)).length, "lomba aktif"), stat(DATA.filter(x => x.j === "Beasiswa" && isLive(x)).length, "beasiswa aktif"), stat(DATA.filter(x => x.t === "Internasional" && isLive(x)).length, "internasional")))),
+  h("div", { class: "wrap" }, sech("Lomba pilihan", "Ajang nasional untuk mahasiswa.", "lomba", "Lihat semua lomba"), hl, sech("Beasiswa luar negeri", "Studi lanjut di luar negeri.", "beasiswa", "Lihat semua beasiswa"), hb,
+    h("div", { class: "arcnote" }, h("p", {}, "Info yang tenggatnya sudah lewat otomatis ditandai ditutup dan dipindahkan ke arsip, jadi yang tampil di sini selalu yang masih bisa didaftar."), h("a", { href: "#arsip" }, "Buka arsip"))));
 
 // Katalog + cek kelayakan
 const ptitle = h("h1"), pdesc = h("p");
@@ -278,24 +285,17 @@ const vCat = h("section", {},
     h("p", { class: "alert" }, "Versi awal. Baru sebagian info yang punya tenggat terverifikasi. Untuk yang belum, buka sumber resmi untuk jadwal dan syarat terbaru sebelum mendaftar."),
     tabs, h("div", { class: "layout" }, side, h("div", {}, resBiasa, resElig))));
 
-// Profil
-const pNama = input("pNama", { maxlength: "60", autocomplete: "name" }), pNim = input("pNim", { maxlength: "20", inputmode: "numeric" });
-const pAng = input("pAng", { maxlength: "4", inputmode: "numeric", placeholder: "2024" });
-const pSem = input("pSem", { type: "number", min: "1", max: "14", inputmode: "numeric" });
-const pIpk = input("pIpk", { type: "number", min: "0", max: "4", step: "0.01", inputmode: "decimal" });
-const pJen = h("div", { class: "chips" }), pMin = h("div", { class: "chips" });
-const pAv = h("span", { class: "av" }, "TI"), pHi = h("b"), pSub = h("div", { class: "org" });
-const pSave = h("button", { class: "btn main", type: "button" }, "Simpan profil"), pDel = h("button", { class: "btn", type: "button" }, "Hapus profil");
-const toastEl = h("span", { class: "toast", role: "status" });
-const pRec = h("div", { class: "grid g1" }), pSaved = h("div", { class: "grid g1" });
-const vProfil = h("section", {},
-  h("div", { class: "phead" }, h("div", { class: "wrap" }, h("h1", {}, "Profil mahasiswa"), h("p", {}, ROUTES.profil[1]))),
-  h("div", { class: "wrap pgrid" },
-    h("div", { class: "pcard" }, h("div", { class: "who" }, pAv, h("div", {}, pHi, pSub)),
-      field("Nama", pNama), h("div", { class: "row2" }, field("NIM", pNim), field("Angkatan", pAng)), h("div", { class: "row2b" }, field("Semester", pSem), field("IPK terakhir", pIpk)),
-      group("Jenjang yang dituju", pJen), group("Minat bidang", pMin), h("div", { class: "acts" }, pSave, pDel), toastEl,
-      h("p", { class: "dt" }, "Profil hanya tersimpan di browser ini dan tidak dikirim ke mana pun.")),
-    h("div", { class: "pcol" }, h("div", { class: "sech" }, h("div", {}, h("h2", {}, "Rekomendasi untukmu"))), pRec, h("div", { class: "sech" }, h("div", {}, h("h2", {}, "Tersimpan"))), pSaved)));
+// Arsip: isinya terbentuk sendiri dari info yang tenggatnya sudah lewat.
+const arcJenis = new Set<string>();
+const arcChips = h("div", { class: "chips" });
+const arcCount = h("span", { class: "dt" });
+const arcList = h("div", {});
+const vArsip = h("section", {},
+  h("div", { class: "phead" }, h("div", { class: "wrap" }, h("h1", {}, ROUTES.arsip[0]), h("p", {}, ROUTES.arsip[1]))),
+  h("div", { class: "wrap" },
+    h("p", { class: "alert" }, "Arsip terisi otomatis dari tanggal tenggat (WIB), tanpa perlu ubah status manual. Tombol pendaftaran dinonaktifkan karena periodenya sudah berakhir."),
+    h("div", { class: "arcbar" }, h("span", { class: "fl" }, "Jenis"), arcChips, arcCount),
+    arcList));
 
 const foot = h("footer", {}, h("div", { class: "wrap" }, h("span", { class: "badge" }, img(HM)), h("span", { class: "pill" }, img(UM)),
   h("p", {}, "Divisi PWK, HMTI Fakultas Teknik, Universitas Mercu Buana. Data hanya penunjuk awal; selalu cek situs resmi penyelenggara. Data diperbarui " + fmtDate(UPDATED) + ".")));
@@ -364,39 +364,51 @@ function paintCat(): void {
   count.textContent = rows.length + " dari " + pool.length + " info";
   fillRows(list, rows, st.month !== 0 ? "Belum ada info bertanggal di bulan ini. Pilih SEMUA untuk melihat daftar lengkap." : st.tingkat.has("Kampus") && st.tingkat.size === 1 ? "Belum ada info tingkat kampus. PWK menambahkannya di daftar DATA." : "Tidak ada hasil. Ubah kata kunci atau reset filter.");
 }
-function paintProfil(): void {
-  const n = pf.nama.trim();
-  pAv.textContent = n ? n.split(/\s+/).slice(0, 2).map(w => w[0]).join("").toUpperCase() : "TI";
-  pHi.textContent = n ? "Halo, " + n.split(/\s+/)[0] : "Profil belum diisi";
-  pSub.textContent = [pf.nim, pf.angkatan && "Angkatan " + pf.angkatan, pf.semester && "Semester " + pf.semester, pf.ipk && "IPK " + pf.ipk].filter(Boolean).join(", ") || "Mahasiswa Teknik Industri, Universitas Mercu Buana";
-  fill(pRec, DATA.filter(x => pf.minat.includes(x.b) || (!!pf.jenjang && !!x.jen && x.jen.includes(pf.jenjang))).slice(0, 6), "Pilih jenjang atau minat, lalu simpan profil untuk melihat rekomendasi.");
-  fill(pSaved, DATA.filter(x => saved.has(x.n)), "Belum ada yang disimpan. Tekan Simpan di kartu mana pun.");
+function paintArsip(): void {
+  mark(arcChips, v => arcJenis.has(v));
+  const all = DATA.filter(isExpired).sort((a, b) => deadlineOf(b) - deadlineOf(a));
+  const rows = all.filter(x => arcJenis.size === 0 || arcJenis.has(x.j));
+  arcCount.textContent = rows.length + " dari " + all.length + " info di arsip";
+  const byYear = new Map<number, Item[]>();
+  for (const x of rows) {
+    const y = new Date(deadlineOf(x) + WIB).getUTCFullYear();
+    const g = byYear.get(y);
+    if (g) g.push(x); else byYear.set(y, [x]);
+  }
+  const out: HTMLElement[] = [];
+  for (const y of Array.from(byYear.keys()).sort((a, b) => b - a)) {
+    out.push(h("h2", { class: "mh" }, "Tahun " + y), h("div", { class: "rows" }, ...(byYear.get(y) ?? []).map(x => row(x))));
+  }
+  arcList.replaceChildren(...(out.length ? out : [h("div", { class: "empty" }, "Belum ada arsip. Info yang tenggatnya lewat akan otomatis muncul di sini.")]));
 }
-const pwChips = (): void => { mark(pJen, v => pw.jenjang === v); mark(pMin, v => pw.minat.includes(v)); };
 function paint(): void {
   navLinks.forEach(a => { if (a.getAttribute("href") === "#" + view) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
-  if (view === "beranda") { const live = (x: Item): boolean => statusOf(x).s !== "ditutup"; fill(hl, DATA.filter(x => x.j === "Lomba" && live(x)).sort(byStatus).slice(0, 3), ""); fill(hb, DATA.filter(x => x.j === "Beasiswa" && x.t === "Internasional" && live(x)).sort(byStatus).slice(0, 3), ""); }
-  else if (view === "profil") paintProfil(); else paintCat();
+  if (view === "beranda") {
+    fill(hl, DATA.filter(x => x.j === "Lomba" && isLive(x)).sort(byStatus).slice(0, 3), "");
+    fill(hb, DATA.filter(x => x.j === "Beasiswa" && x.t === "Internasional" && isLive(x)).sort(byStatus).slice(0, 3), "");
+  }
+  else if (view === "arsip") paintArsip();
+  else paintCat();
 }
 function route(): void {
   const raw = (location.hash || "#beranda").slice(1);
   view = isRoute(raw) ? raw : "beranda";
-  vBeranda.hidden = view !== "beranda"; vProfil.hidden = view !== "profil"; vCat.hidden = view === "beranda" || view === "profil";
+  vBeranda.hidden = view !== "beranda"; vArsip.hidden = view !== "arsip";
+  vCat.hidden = view === "beranda" || view === "arsip";
   ptitle.textContent = ROUTES[view][0]; pdesc.textContent = ROUTES[view][1];
-  if (view === "profil") { pw = { jenjang: pf.jenjang, minat: pf.minat.slice() }; pNama.value = pf.nama; pNim.value = pf.nim; pAng.value = pf.angkatan; pSem.value = pf.semester; pIpk.value = pf.ipk; pwChips(); }
   if (view === "cari") { eSem.value = sd.sem; eIpk.value = sd.ipk; eKerja.value = sd.kerja; }
   window.scrollTo(0, 0); paint();
 }
-function toast(t: string): void { toastEl.textContent = t; window.setTimeout(() => { toastEl.textContent = ""; }, 2200); }
 
 /* ---------- init ---------- */
 function init(): void {
   document.documentElement.style.setProperty("--hmti", "url(" + HM + ")");
+  // Sisa data profil dari versi sebelumnya tidak dipakai lagi.
+  try { localStorage.removeItem("tiProfil"); } catch { /* storage dimatikan */ }
   chipRow(cStatus, STAT.map(z => z.id), v => { sd.status = v; eligRun = false; paint(); }, Object.fromEntries(STAT.map(z => [z.id, z.label])));
   chipRow(cTujuan, ["Semua", "Nasional", "Internasional"], v => { sd.tujuan = v; paint(); }, { Semua: "Semua", Nasional: "Dalam negeri", Internasional: "Luar negeri" });
   chipRow(cBiaya, ["ya", "tidak"], v => { sd.biaya = v === "ya"; paint(); }, { ya: "Ya", tidak: "Tidak" });
-  chipRow(pJen, ["S1", "S2", "S3"], v => { pw.jenjang = pw.jenjang === v ? "" : v; pwChips(); });
-  chipRow(pMin, BID, v => { const i = pw.minat.indexOf(v); if (i < 0) pw.minat.push(v); else pw.minat.splice(i, 1); pwChips(); });
+  chipRow(arcChips, ["Lomba", "Beasiswa"], v => { if (arcJenis.has(v)) arcJenis.delete(v); else arcJenis.add(v); paint(); });
   tabBiasa.addEventListener("click", () => { mode = "biasa"; paint(); });
   tabLayak.addEventListener("click", () => { mode = "layak"; paint(); });
   runBtn.addEventListener("click", () => { sd.sem = eSem.value.trim(); sd.ipk = eIpk.value.trim(); sd.kerja = eKerja.value.trim() || "0"; eligRun = true; paint(); });
@@ -411,14 +423,23 @@ function init(): void {
   yPrev.addEventListener("click", () => { st.year = Math.max(YEAR0 - 2, st.year - 1); paint(); });
   yNext.addEventListener("click", () => { st.year = Math.min(YEAR0 + 3, st.year + 1); paint(); });
   hs.addEventListener("submit", e => { e.preventDefault(); st.q = hq.value.trim().slice(0, 100); q.value = st.q; mode = "biasa"; if (location.hash === "#cari") route(); else location.hash = "#cari"; });
-  pSave.addEventListener("click", () => {
-    pf = { nama: pNama.value.trim().slice(0, 60), nim: pNim.value.trim().slice(0, 20), angkatan: pAng.value.trim().slice(0, 4), semester: pSem.value.trim().slice(0, 2), ipk: pIpk.value.trim().slice(0, 4), jenjang: pw.jenjang, minat: pw.minat.slice() };
-    sd.sem = pf.semester; sd.ipk = pf.ipk;
-    save("tiProfil", pf); paint(); toast("Profil disimpan");
-  });
-  pDel.addEventListener("click", () => { pf = { ...EMPTY }; try { localStorage.removeItem("tiProfil"); } catch { /* abaikan */ } route(); toast("Profil dihapus"); });
   window.addEventListener("hashchange", route);
-  document.getElementById("app")!.replaceChildren(nav, h("main", {}, vBeranda, vCat, vProfil), foot);
+  document.getElementById("app")!.replaceChildren(nav, h("main", {}, vBeranda, vCat, vArsip), foot);
   route();
+
+  // Status mengikuti jam sebenarnya: dicek ulang tiap menit dan saat tab aktif
+  // lagi, jadi tidak perlu admin mengubah status "ditutup" secara manual.
+  const statusSig = (): string => DATA.map(x => statusOf(x).s).join("|");
+  let sig = statusSig();
+  const refreshStatus = (): void => {
+    NOW = Date.now();
+    const next = statusSig();
+    if (next === sig) return;
+    sig = next;
+    paint();
+  };
+  window.setInterval(refreshStatus, 60000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshStatus(); });
+  window.addEventListener("focus", refreshStatus);
 }
 init();
