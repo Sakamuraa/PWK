@@ -29,31 +29,31 @@ const HM = "/IMG_4190.PNG";
 const UM = "/LOGO UMB_WARNA OPSI 2.png";
 
 const DATA: Item[] = [
-{n:"PIMNAS (hasil PKM)",j:"Lomba",t:"Nasional",b:"Riset & Inovasi",o:"Kemdiktisaintek",d:"Pekan Ilmiah Mahasiswa Nasional untuk tim lolos pendanaan PKM.",tg:""},
-{n:"PKM (Program Kreativitas Mahasiswa)",j:"Lomba",t:"Nasional",b:"Riset & Inovasi",o:"Kemdiktisaintek",d:"Skema riset, pengabdian, kewirausahaan, karsa cipta. Seleksi dimulai dari kampus.",tg:""},
-{n:"GEMASTIK",u:"https://kemdiktisaintek.go.id/announcement/article/penawaran-gemastik-2026",op:"2026-07-20",dl:"2026-08-14",j:"Lomba",t:"Nasional",b:"Teknologi & Data",o:"Kemdiktisaintek",d:"Pagelaran mahasiswa nasional bidang TIK: data mining, pemrograman, desain, dll.",tg:""},
-{n:"KMI Expo",j:"Lomba",t:"Nasional",b:"Bisnis & Kewirausahaan",o:"Kemdiktisaintek",d:"Ajang pameran dan seleksi usaha mahasiswa.",tg:""},
-{n:"KDMI (Debat Mahasiswa Indonesia)",j:"Lomba",t:"Nasional",b:"Umum",o:"Kemdiktisaintek",d:"Kompetisi debat mahasiswa tingkat nasional.",tg:""},
-{n:"IISE Student Competitions",j:"Lomba",t:"Internasional",b:"Teknik Industri",o:"Institute of Industrial and Systems Engineers",d:"Kompetisi mahasiswa seputar industrial & systems engineering.",tg:"",u:"https://www.iise.org"},
-{n:"Hult Prize",j:"Lomba",t:"Internasional",b:"Bisnis & Kewirausahaan",o:"Hult Prize Foundation",d:"Kompetisi social enterprise untuk tim mahasiswa, seleksi berjenjang dari kampus.",tg:"",u:"https://www.hultprize.org"},
-{n:"Google Solution Challenge",u:"https://developers.google.com/community/gdsc-solution-challenge",j:"Lomba",t:"Internasional",b:"Teknologi & Data",o:"Google Developer Groups",d:"Bangun solusi teknologi untuk tujuan SDGs.",tg:""},
-{n:"Shell Eco-marathon",j:"Lomba",t:"Internasional",b:"Rekayasa & Manufaktur",o:"Shell",d:"Rancang kendaraan hemat energi. Ada regional Asia.",tg:""},
-{n:"KIP Kuliah",u:"https://kip-kuliah.kemdiktisaintek.go.id/",j:"Beasiswa",t:"Nasional",b:"Umum",o:"Pemerintah RI",d:"Bantuan biaya pendidikan untuk mahasiswa berprestasi dari keluarga kurang mampu.",tg:"",jen:"S1"},
-{n:"LPDP",j:"Beasiswa",t:"Internasional",b:"Umum",o:"Kemenkeu RI",d:"Beasiswa S2/S3 dalam dan luar negeri.",tg:"",jen:"S2/S3",u:"https://lpdp.kemenkeu.go.id"},
-{n:"Beasiswa Unggulan",op:"2026-08-20",dl:"2026-08-24",j:"Beasiswa",t:"Nasional",b:"Umum",o:"Kemdiktisaintek",d:"Untuk mahasiswa berprestasi, jenjang sarjana hingga doktor.",tg:"",jen:"S1/S2/S3"},
-{n:"Djarum Beasiswa Plus",u:"https://register.djarumbeasiswaplus.org/",op:"2026-04-08",dl:"2026-06-10",j:"Beasiswa",t:"Nasional",b:"Umum",o:"Djarum Foundation",d:"Beasiswa dan pengembangan soft skill untuk mahasiswa aktif.",tg:"",jen:"S1"},
-{n:"Beasiswa Bakti BCA",u:"https://www.bca.co.id/id/tentang-bca/CSR/Bakti-BCA/bakti-pendidikan/beasiswa-bakti-bca",op:"2026-08-03",dl:"2026-09-30",j:"Beasiswa",t:"Nasional",b:"Umum",o:"Bakti BCA",d:"Beasiswa mahasiswa berprestasi dan aktif berorganisasi.",tg:"",jen:"S1"},
-{n:"Tanoto Foundation Scholarship",u:"https://www.tanotofoundation.org/",j:"Beasiswa",t:"Nasional",b:"Umum",o:"Tanoto Foundation",d:"Beasiswa dan pembinaan kepemimpinan untuk mahasiswa.",tg:"",jen:"S1"},
-{n:"GENBI",j:"Beasiswa",t:"Nasional",b:"Umum",o:"Bank Indonesia",d:"Beasiswa dan komunitas Generasi Baru Indonesia.",tg:"",jen:"S1"},
-{n:"Chevening",dl:"2026-10-06T11:00:00Z",op:"2026-08-04T11:00:00Z",j:"Beasiswa",t:"Internasional",b:"Umum",o:"Pemerintah Inggris",d:"Beasiswa S2 ke Inggris.",tg:"",jen:"S2",u:"https://www.chevening.org"},
-{n:"Fulbright (AMINEF)",j:"Beasiswa",t:"Internasional",b:"Umum",o:"AMINEF",d:"Beasiswa studi ke Amerika Serikat.",tg:"",jen:"S2/S3",u:"https://www.aminef.or.id"},
-{n:"MEXT (Jepang)",j:"Beasiswa",t:"Internasional",b:"Umum",o:"Pemerintah Jepang",d:"Beasiswa pemerintah Jepang untuk berbagai jenjang.",tg:"",jen:"S1/S2/S3",u:"https://www.studyinjapan.go.jp"},
-{n:"Global Korea Scholarship (GKS)",u:"https://www.studyinkorea.go.kr/",j:"Beasiswa",t:"Internasional",b:"Umum",o:"Pemerintah Korea Selatan",d:"Beasiswa studi di Korea Selatan.",tg:"",jen:"S1/S2/S3"},
-{n:"DAAD (Jerman)",u:"https://www.daad.de/en/",j:"Beasiswa",t:"Internasional",b:"Umum",o:"DAAD",d:"Beasiswa studi dan riset di Jerman.",tg:"",jen:"S2/S3"},
-{n:"Australia Awards",j:"Beasiswa",t:"Internasional",b:"Umum",o:"Pemerintah Australia",d:"Beasiswa S2/S3 ke Australia.",tg:"",jen:"S2/S3",u:"https://www.australiaawards.gov.au"},
-{n:"Erasmus Mundus Joint Masters",j:"Beasiswa",t:"Internasional",b:"Umum",o:"Uni Eropa",d:"Program magister gabungan di beberapa negara Eropa.",tg:"",jen:"S2",u:"https://erasmus-plus.ec.europa.eu"},
-{n:"Türkiye Burslari",u:"https://turkiyeburslari.gov.tr/",j:"Beasiswa",t:"Internasional",b:"Umum",o:"Pemerintah Turki",d:"Beasiswa studi di Turki.",tg:"",jen:"S1/S2/S3"},
-{n:"Chinese Government Scholarship (CSC)",u:"https://www.csc.edu.cn/",j:"Beasiswa",t:"Internasional",b:"Umum",o:"China Scholarship Council",d:"Beasiswa studi di universitas China.",tg:"",jen:"S1/S2/S3"}
+{n:"PIMNAS (hasil PKM)",j:"Lomba",t:"Nasional",b:"Riset & Inovasi",o:"Kemdiktisaintek",d:"Pekan Ilmiah Mahasiswa Nasional untuk tim lolos pendanaan PKM.",tg:"PIMNAS ke-39: 2–7 Nov 2026 di UNDIP Semarang. Peserta dari tim PKM yang lolos pendanaan."},
+{n:"PKM (Program Kreativitas Mahasiswa)",j:"Lomba",t:"Nasional",b:"Riset & Inovasi",o:"Kemdiktisaintek",d:"Skema riset, pengabdian, kewirausahaan, karsa cipta. Seleksi dimulai dari kampus.",tg:"Jadwal PKM 2027 belum terbit. Unggah proposal biasanya sekitar Februari."},
+{n:"GEMASTIK",u:"https://kemdiktisaintek.go.id/announcement/article/penawaran-gemastik-2026",op:"2026-07-27",dl:"2026-08-17",j:"Lomba",t:"Nasional",b:"Teknologi & Data",o:"Kemdiktisaintek",d:"Pagelaran mahasiswa nasional bidang TIK: data mining, pemrograman, desain, dll.",tg:"GEMASTIK XIX 2026: pendaftaran 27 Jul–17 Agu 2026. Edisi 2027 belum diumumkan."},
+{n:"KMI Expo",j:"Lomba",t:"Nasional",b:"Bisnis & Kewirausahaan",o:"Kemdiktisaintek",d:"Ajang pameran dan seleksi usaha mahasiswa.",tg:"KMI Expo XVII: 29 Sep–1 Okt 2026 di UNSOED. Peserta lewat seleksi P2MW."},
+{n:"KDMI (Debat Mahasiswa Indonesia)",j:"Lomba",t:"Nasional",b:"Umum",o:"Kemdiktisaintek",d:"Kompetisi debat mahasiswa tingkat nasional.",tg:"Jadwal KDMI nasional belum terbit di situs resmi. Cek pengumuman kampus."},
+{n:"IISE Student Competitions",dl:"2027-01-17",j:"Lomba",t:"Internasional",b:"Teknik Industri",o:"Institute of Industrial and Systems Engineers",d:"Kompetisi mahasiswa seputar industrial & systems engineering.",tg:"IISE 2027: abstrak 15 Nov 2026, full paper 17 Jan 2027, pendaftaran pembicara 7 Mar 2027.",u:"https://www.iise.org"},
+{n:"Hult Prize",dl:"2027-02-28",j:"Lomba",t:"Internasional",b:"Bisnis & Kewirausahaan",o:"Hult Prize Foundation",d:"Kompetisi social enterprise untuk tim mahasiswa, seleksi berjenjang dari kampus.",tg:"Hult Prize 2027: pendaftaran tutup 28 Feb 2027. Babak kampus selesai 15 Feb 2027.",u:"https://www.hultprize.org"},
+{n:"Google Solution Challenge",u:"https://developers.google.com/community/gdsc-solution-challenge",j:"Lomba",t:"Internasional",b:"Teknologi & Data",o:"Google Developer Groups",d:"Bangun solusi teknologi untuk tujuan SDGs.",tg:"Edisi 2027 belum diumumkan. Biasanya dibuka sekitar Feb–Mar."},
+{n:"Shell Eco-marathon",op:"2026-09-21",dl:"2026-12-08",j:"Lomba",t:"Internasional",b:"Rekayasa & Manufaktur",o:"Shell",d:"Rancang kendaraan hemat energi. Ada regional Asia.",tg:"Fase teknis 2027: 21 Sep–8 Des 2026. Event APME Qatar dibatalkan."},
+{n:"KIP Kuliah",u:"https://kip-kuliah.kemdiktisaintek.go.id/",j:"Beasiswa",t:"Nasional",b:"Umum",o:"Pemerintah RI",d:"Bantuan biaya pendidikan untuk mahasiswa berprestasi dari keluarga kurang mampu.",tg:"KIP Kuliah 2026: akun siswa 3 Feb–11 Nov 2026. Jadwal 2027 belum diumumkan.",jen:"S1"},
+{n:"LPDP",j:"Beasiswa",t:"Internasional",b:"Umum",o:"Kemenkeu RI",d:"Beasiswa S2/S3 dalam dan luar negeri.",tg:"LPDP 2027 belum dibuka, tanggal belum diumumkan. Co-funding berjalan s.d. 1 Des 2026.",jen:"S2/S3",u:"https://lpdp.kemenkeu.go.id"},
+{n:"Beasiswa Unggulan",op:"2026-08-20",dl:"2026-08-24",j:"Beasiswa",t:"Nasional",b:"Umum",o:"Kemdiktisaintek",d:"Untuk mahasiswa berprestasi, jenjang sarjana hingga doktor.",tg:"Beasiswa Unggulan 2026: 20–24 Agu 2026. Jadwal 2027 belum terbit.",jen:"S1/S2/S3"},
+{n:"Djarum Beasiswa Plus",u:"https://register.djarumbeasiswaplus.org/",op:"2026-04-08",dl:"2026-06-10",j:"Beasiswa",t:"Nasional",b:"Umum",o:"Djarum Foundation",d:"Beasiswa dan pengembangan soft skill untuk mahasiswa aktif.",tg:"Djarum Beasiswa Plus 2026: 8 Apr–10 Jun 2026. Jadwal 2027 belum terbit.",jen:"S1"},
+{n:"Beasiswa Bakti BCA",u:"https://www.bca.co.id/id/tentang-bca/CSR/Bakti-BCA/bakti-pendidikan/beasiswa-bakti-bca",op:"2026-08-03",dl:"2026-09-30",j:"Beasiswa",t:"Nasional",b:"Umum",o:"Bakti BCA",d:"Beasiswa mahasiswa berprestasi dan aktif berorganisasi.",tg:"Bakti BCA 2027: pendaftaran 3 Agu–30 Sep 2026.",jen:"S1"},
+{n:"Tanoto Foundation Scholarship",u:"https://www.tanotofoundation.org/",op:"2026-07-01",dl:"2026-09-07",j:"Beasiswa",t:"Nasional",b:"Umum",o:"Tanoto Foundation",d:"Beasiswa dan pembinaan kepemimpinan untuk mahasiswa.",tg:"TELADAN 2027: pendaftaran 1 Jul–7 Sep 2026, untuk mahasiswa semester 1 di 10 PT mitra.",jen:"S1"},
+{n:"GENBI",j:"Beasiswa",t:"Nasional",b:"Umum",o:"Bank Indonesia",d:"Beasiswa dan komunitas Generasi Baru Indonesia.",tg:"Rekrutmen dibuka per kantor perwakilan BI. Jadwal 2027 belum terbit.",jen:"S1"},
+{n:"Chevening",dl:"2026-10-06T11:00:00Z",op:"2026-08-04T11:00:00Z",j:"Beasiswa",t:"Internasional",b:"Umum",o:"Pemerintah Inggris",d:"Beasiswa S2 ke Inggris.",tg:"Chevening 2027/28 ditutup 6 Okt 2026. Siklus berikutnya dibuka sekitar Agu 2027.",jen:"S2",u:"https://www.chevening.org"},
+{n:"Fulbright (AMINEF)",dl:"2027-02-15",j:"Beasiswa",t:"Internasional",b:"Umum",o:"AMINEF",d:"Beasiswa studi ke Amerika Serikat.",tg:"Tenggat 15 Feb 2027 pukul 23.59 WIB.",jen:"S2/S3",u:"https://www.aminef.or.id"},
+{n:"MEXT (Jepang)",j:"Beasiswa",t:"Internasional",b:"Umum",o:"Pemerintah Jepang",d:"Beasiswa pemerintah Jepang untuk berbagai jenjang.",tg:"Rekrutmen MEXT 2028 lewat kedutaan sekitar Apr–Mei 2027. Kuota 2027 sudah lewat.",jen:"S1/S2/S3",u:"https://www.studyinjapan.go.jp"},
+{n:"Global Korea Scholarship (GKS)",u:"https://www.studyinkorea.go.kr/",j:"Beasiswa",t:"Internasional",b:"Umum",o:"Pemerintah Korea Selatan",d:"Beasiswa studi di Korea Selatan.",tg:"GKS-U 2027 jalur kedutaan tutup 30 Sep 2026. GKS-G 2027 belum diumumkan.",jen:"S1/S2/S3"},
+{n:"DAAD (Jerman)",u:"https://www.daad.de/en/",j:"Beasiswa",t:"Internasional",b:"Umum",o:"DAAD",d:"Beasiswa studi dan riset di Jerman.",tg:"Tenggat berbeda per program dan per negara. Cek daad-indonesia.org.",jen:"S2/S3"},
+{n:"Australia Awards",j:"Beasiswa",t:"Internasional",b:"Umum",o:"Pemerintah Australia",d:"Beasiswa S2/S3 ke Australia.",tg:"Intake 2028: 1 Feb–28 Apr 2027, pukul 11.00 WIB.",jen:"S2/S3",op:"2027-02-01",dl:"2027-04-28T04:00:00Z",u:"https://www.australiaawards.gov.au"},
+{n:"Erasmus Mundus Joint Masters",j:"Beasiswa",t:"Internasional",b:"Umum",o:"Uni Eropa",d:"Program magister gabungan di beberapa negara Eropa.",tg:"Tenggat berbeda per program (contoh REPLAY: 8 Jan 2027). Cek situs program.",jen:"S2",u:"https://erasmus-plus.ec.europa.eu"},
+{n:"Türkiye Burslari",u:"https://turkiyeburslari.gov.tr/",op:"2027-01-10",dl:"2027-02-20",j:"Beasiswa",t:"Internasional",b:"Umum",o:"Pemerintah Turki",d:"Beasiswa studi di Turki.",tg:"Pendaftaran tahunan 10 Jan–20 Feb 2027.",jen:"S1/S2/S3"},
+{n:"Chinese Government Scholarship (CSC)",dl:"2027-02-14",u:"https://www.csc.edu.cn/",j:"Beasiswa",t:"Internasional",b:"Umum",o:"China Scholarship Council",d:"Beasiswa studi di universitas China.",tg:"CSC 2027/2028 jalur Kedutaan China: berkas paling lambat 14 Feb 2027.",jen:"S1/S2/S3"}
 ];
 
 // Syarat INDIKATIF, belum diverifikasi PWK. Cek pedoman resmi sebelum mendaftar.
@@ -152,7 +152,7 @@ const img = (src: string, alt = ""): HTMLImageElement => { const i = h("img", { 
 /* ---------- waktu & status tenggat ---------- */
 // Semua perhitungan memakai WIB (UTC+7). NOW diperbarui berkala supaya status
 // berpindah sendiri ke "ditutup" tanpa perlu admin mengubah data.
-const UPDATED = "2026-11-21";   // ubah setiap kali data diperbarui
+const UPDATED = "2026-11-25";   // ubah setiap kali data diperbarui
 const DAY = 86400000, WIB = 7 * 3600000;
 let NOW = Date.now();
 // Tahun berjalan menurut kalender WIB.

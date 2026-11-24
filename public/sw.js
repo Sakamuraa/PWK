@@ -1,6 +1,6 @@
 // Service worker katalog PWK.
 // Naikkan angka CACHE setiap deploy agar aset lama dibuang.
-const CACHE = "pwk-v1";
+const CACHE = "pwk-v2";
 const PRECACHE = ["/", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png"];
 
 self.addEventListener("install", (e) => {

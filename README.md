@@ -22,7 +22,7 @@ npm run preview
 
 Status pendaftaran dihitung sendiri dari tanggal, tanpa admin mengubahnya manual:
 
-- Tanggal dibaca dengan zona waktu WIB (Asia/Jakarta). Tenggat bertanggal saja (`2026-08-14`) berarti berlaku sampai 23.59.59 WIB di hari itu.
+- Tanggal dibaca dengan zona waktu WIB (Asia/Jakarta). Tenggat bertanggal saja (`2027-02-15`) berarti berlaku sampai 23.59.59 WIB di hari itu.
 - Lewat tenggat → status otomatis `Sudah ditutup` dan tombol pendaftaran berubah menjadi nonaktif (`Pendaftaran ditutup`).
 - Beranda hanya menampilkan info yang belum lewat tenggat; statistiknya ikut menghitung info aktif saja.
 - Info yang sudah lewat dipindahkan ke halaman **Arsip** (`#arsip`), dikelompokkan per tahun dan bisa disaring per jenis.
