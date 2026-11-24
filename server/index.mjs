@@ -9,6 +9,9 @@ import {
 } from "./db.mjs";
 import { runPipeline, addManual, isLocked } from "./lib/pipeline.mjs";
 import { loadSources } from "./lib/sources.mjs";
+import { readFileSync } from "node:fs";
+
+const pkgVersion = (() => { try { return JSON.parse(readFileSync("/data/workspace/PWK/package.json", "utf8")).version; } catch { return "0.0.0"; } })();
 
 seedIfEmpty();
 
@@ -100,6 +103,7 @@ const server = http.createServer(async (req, res) => {
       const sources = loadSources().map((s) => ({ name: s.name, url: s.url, tier: s.tier, j: s.j }));
       const last = stateGet("src:last", {});
       return json(res, 200, {
+        version: pkgVersion,
         updated: new Date().toISOString(),
         counts: counts(),
         sources: sources.map((s) => ({ ...s, last_fetch: last[s.name] || null })),
