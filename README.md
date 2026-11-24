@@ -29,7 +29,24 @@ Status pendaftaran dihitung sendiri dari tanggal, tanpa admin mengubahnya manual
 - Pengecekan ulang berjalan tiap menit dan setiap tab kembali aktif, jadi status ikut berubah tanpa reload.
 - Di halaman Cari, info kedaluwarsa masih bisa ditemukan (misalnya untuk melihat periode lalu), tetapi tombol pendaftarannya nonaktif.
 
-Untuk menambah info baru cukup isi `nama`, `dl` (tenggat) di `DATA` pada `src/app.ts`.
+Untuk menambah info baru cukup isi `nama`, `dl` (tenggat) di `DATA` pada `src/app.ts`. Info yang belum punya `dl` diberi status `Tanggal belum diverifikasi`: tetap tampil di katalog, tetapi tidak bisa masuk arsip dan tidak dihitung sebagai "aktif" pada statistik beranda. Jumlah info tanpa tanggal ditampilkan apa adanya di beranda.
+
+## Halaman detail
+
+Setiap info punya halaman sendiri di `#item/<slug>` (misalnya `#item/gemastik`), dibuat dari `slugOf(nama)`. Tautan ini bisa dibagikan; judul kartu dan baris mengarah ke sini, sedangkan tombol "Buka situs resmi" tetap menuju portal penyelenggara. Isi halaman: ringkasan, jadwal, syarat indikatif dari `REQ`, info terkait, tombol simpan, serta ekspor kalender.
+
+## Ekspor kalender
+
+Untuk info yang punya `dl`, halaman detail menyediakan:
+
+- **Ekspor .ics** — berkas `VEVENT` dengan tenggat WIB yang bisa diimpor ke kalender mana pun.
+- **Google Calendar** — tautan `action=TEMPLATE` siap tambah acara.
+
+Mulai acara diambil dari `op` bila ada; kalau tidak, sehari sebelum tenggat.
+
+## PWA dan offline
+
+`public/manifest.webmanifest` dan `public/sw.js` didaftarkan saat build produksi (`import.meta.env.PROD`). Aset disimpan cache-first, navigasi network-first dengan fallback ke `index.html`, jadi katalog tetap terbuka saat sinyal jelek. Naikkan angka `CACHE` di `sw.js` setiap deploy agar aset lama dibuang.
 
 ## Deploy ke Vercel
 
