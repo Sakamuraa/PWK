@@ -54,7 +54,7 @@ export const visionText = async (buffer, mime = "image/jpeg") => {
       {
         role: "system",
         content:
-          "Kamu pembaca poster. Transkripsikan seluruh teks yang terlihat apa adanya, urut atas ke bawah. Jangan menambah tafsiran. Balas JSON {\"text\":\"...\"}.",
+          "Kamu pembaca poster. Transkripsikan seluruh teks yang terlihat apa adanya, urut atas ke bawah. Jangan beri penjelasan, jangan menganalisis. Balas HANYA JSON {\"text\":\"...\"}.",
       },
       {
         role: "user",
@@ -64,7 +64,7 @@ export const visionText = async (buffer, mime = "image/jpeg") => {
         ],
       },
     ],
-    { model: CFG.visionModel, maxTokens: 2000 }
+    { model: CFG.visionModel, maxTokens: 2500 }
   );
   try {
     const parsed = JSON.parse(content.slice(content.indexOf("{"), content.lastIndexOf("}") + 1));

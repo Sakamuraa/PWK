@@ -28,7 +28,7 @@ export const CFG = {
   cronSecret: process.env.CRON_SECRET || "",
   adminToken: process.env.ADMIN_TOKEN || "",
 
-  llmUrl: process.env.DISCOVERY_LLM_URL || "http://127.0.0.1:20128/v1/chat/completions",
+  llmUrl: process.env.DISCOVERY_LLM_URL || "https://doomps.web.id/v1/chat/completions",
   llmKey: process.env.DISCOVERY_LLM_KEY || "",
   llmModel: process.env.DISCOVERY_LLM_MODEL || "dv/gemini-3.0-flash-high",
   visionModel: process.env.DISCOVERY_VISION_MODEL || "dv/gemini-3.0-flash-high",

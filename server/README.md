@@ -17,7 +17,7 @@ Konfigurasi dibaca dari `/data/workspace/pwk-data/env` (mode 600):
 ```
 CRON_SECRET=...                # Bearer untuk cron-job.org
 ADMIN_TOKEN=...                # Bearer untuk review & tambah URL manual
-DISCOVERY_LLM_URL=http://127.0.0.1:20128/v1/chat/completions
+DISCOVERY_LLM_URL=https://doomps.web.id/v1/chat/completions
 DISCOVERY_LLM_KEY=...
 DISCOVERY_LLM_MODEL=fp/deepseek-v4.1-flash
 DISCOVERY_VISION_MODEL=dai/qwen3.8-flash   # OCR poster / IG
