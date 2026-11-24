@@ -327,12 +327,18 @@ const resElig = h("div", {});
 const tabBiasa = h("button", { class: "tab", type: "button" }, "Cari biasa"), tabLayak = h("button", { class: "tab", type: "button" }, "Cek kelayakan beasiswa");
 const tabs = h("div", { class: "tabs" }, tabBiasa, tabLayak);
 const side = h("aside", { class: "side", "aria-label": "Filter" }, filterPanel, eligPanel);
+const fToggle = h("button", { class: "ftoggle", type: "button", "aria-expanded": "false" },
+  icon("sliders"), h("span", {}, "Filter & kelayakan"));
+fToggle.addEventListener("click", () => {
+  const open = side.classList.toggle("open");
+  fToggle.setAttribute("aria-expanded", String(open));
+});
 const vCat = h("section", {},
   h("div", { class: "phead" }, h("div", { class: "wrap" }, ptitle, pdesc)),
   h("div", { class: "band" }),
   h("div", { class: "wrap" },
     h("p", { class: "alert" }, "Versi awal. Baru sebagian info yang punya tenggat terverifikasi. Untuk yang belum, buka sumber resmi untuk jadwal dan syarat terbaru sebelum mendaftar."),
-    tabs, h("div", { class: "layout" }, side, h("div", {}, resBiasa, resElig))));
+    tabs, fToggle, h("div", { class: "layout" }, side, h("div", {}, resBiasa, resElig))));
 
 // Arsip: isinya terbentuk sendiri dari info yang tenggatnya sudah lewat.
 const arcJenis = new Set<string>();
@@ -464,7 +470,8 @@ function paintCat(): void {
   }
   syncs.forEach(f => f());
   const fj = fixedJenis(), ql = st.q.toLowerCase();
-  const pool = DATA.filter(x => fj ? x.j === fj : st.jenis.size === 0 || st.jenis.has(x.j));
+  const showExpired = Array.from(st.status).some(f => statusMatch(f, "ditutup"));
+  const pool = DATA.filter(x => (isLive(x) || showExpired) && (fj ? x.j === fj : st.jenis.size === 0 || st.jenis.has(x.j)));
   const rows = pool.filter(x =>
     (st.tingkat.size === 0 || st.tingkat.has(x.t)) && (st.bidang.size === 0 || st.bidang.has(x.b)) &&
     (st.jenjang.size === 0 || Array.from(st.jenjang).some(j => (x.jen ?? "").includes(j))) &&
