@@ -159,7 +159,7 @@ let NOW = Date.now();
 const yearWib = (): number => new Date(NOW + WIB).getUTCFullYear();
 const toTime = (s: string, end: boolean): number => Date.parse(s.length === 10 ? s + (end ? "T23:59:59+07:00" : "T00:00:00+07:00") : s);
 const fmtDate = (s: string, end = true): string => new Date(toTime(s, end)).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Jakarta" });
-const STLABEL: Record<Status, string> = { buka: "Dibuka", segera: "Segera ditutup", belum: "Belum dibuka", ditutup: "Sudah ditutup", tbd: "Tanggal belum diverifikasi" };
+const STLABEL: Record<Status, string> = { buka: "Dibuka", segera: "Segera ditutup", belum: "Belum dibuka", ditutup: "Sudah ditutup", tbd: "Tanggal belum ada" };
 const RANK: Record<Status, number> = { segera: 0, buka: 1, belum: 2, tbd: 3, ditutup: 4 };
 function statusOf(x: Item): StInfo {
   const dl = x.dl ? toTime(x.dl, true) : NaN, op = x.op ? toTime(x.op, false) : NaN;
@@ -254,7 +254,9 @@ function input(id: string, attrs: Record<string, string> = {}): HTMLInputElement
 const field = (label: string, i: HTMLInputElement): HTMLElement => h("div", { class: "field" }, h("label", { for: i.id }, label), i);
 
 /* ---------- kerangka tampilan ---------- */
-const navLinks = ([["beranda", "Beranda"], ["cari", "Cari"], ["lomba", "Info Lomba"], ["beasiswa", "Info Beasiswa"], ["arsip", "Arsip"]] as [Route, string][]).map(([r, l]) => h("a", { href: "#" + r }, l));
+const SHORT: Record<Route, string> = { beranda: "Beranda", cari: "Cari", lomba: "Lomba", beasiswa: "Beasiswa", arsip: "Arsip" };
+const navLinks = ([["beranda", "Beranda"], ["cari", "Cari"], ["lomba", "Info Lomba"], ["beasiswa", "Info Beasiswa"], ["arsip", "Arsip"]] as [Route, string][]).map(([r, l]) =>
+  h("a", { href: "#" + r, "aria-label": l }, h("span", { class: "lg", "aria-hidden": "true" }, l), h("span", { class: "sh", "aria-hidden": "true" }, SHORT[r])));
 const nav = h("nav", { class: "nav", "aria-label": "Menu utama" }, h("div", { class: "wrap nav-in" },
   h("a", { class: "brand", href: "#beranda" }, h("span", { class: "badge sm" }, img(HM, "Logo HMTI")), h("span", { class: "bt" }, "Lomba & Beasiswa TI")),
   h("div", { class: "links" }, ...navLinks)));
@@ -274,6 +276,7 @@ const vBeranda = h("section", {},
       h("p", { class: "sub" }, "Satu tempat untuk mencari lomba kampus, nasional, internasional, dan beasiswa dalam maupun luar negeri. Khusus anggota Teknik Industri."),
       hs,
       h("div", { class: "stats" }, stat(DATA.filter(x => x.j === "Lomba" && isLive(x)).length, "lomba aktif"), stat(DATA.filter(x => x.j === "Beasiswa" && isLive(x)).length, "beasiswa aktif"), stat(DATA.filter(x => x.t === "Internasional" && isLive(x)).length, "internasional")))),
+  h("div", { class: "band" }),
   h("div", { class: "wrap" }, sech("Lomba pilihan", "Ajang nasional untuk mahasiswa.", "lomba", "Lihat semua lomba"), hl, sech("Beasiswa luar negeri", "Studi lanjut di luar negeri.", "beasiswa", "Lihat semua beasiswa"), hb,
     h("div", { class: "arcnote" }, h("p", {}, "Info yang tenggatnya sudah lewat otomatis ditandai ditutup dan dipindahkan ke arsip, jadi yang tampil di sini selalu yang masih bisa didaftar."), h("a", { href: "#arsip" }, "Buka arsip")),
     h("p", { class: "srcnote" }, DATA.filter(x => !x.dl).length + " dari " + DATA.length + " info belum punya tanggal resmi yang bisa diverifikasi, jadi statusnya tidak dihitung otomatis. Tanggalnya dicek manual dari situs penyelenggara.")));
@@ -326,6 +329,7 @@ const tabs = h("div", { class: "tabs" }, tabBiasa, tabLayak);
 const side = h("aside", { class: "side", "aria-label": "Filter" }, filterPanel, eligPanel);
 const vCat = h("section", {},
   h("div", { class: "phead" }, h("div", { class: "wrap" }, ptitle, pdesc)),
+  h("div", { class: "band" }),
   h("div", { class: "wrap" },
     h("p", { class: "alert" }, "Versi awal. Baru sebagian info yang punya tenggat terverifikasi. Untuk yang belum, buka sumber resmi untuk jadwal dan syarat terbaru sebelum mendaftar."),
     tabs, h("div", { class: "layout" }, side, h("div", {}, resBiasa, resElig))));
@@ -340,7 +344,8 @@ const vArsip = h("section", {},
   h("div", { class: "wrap" },
     h("p", { class: "alert" }, "Arsip terisi otomatis dari tanggal tenggat (WIB), tanpa perlu ubah status manual. Tombol pendaftaran dinonaktifkan karena periodenya sudah berakhir. Info yang belum punya tanggal resmi tidak masuk arsip."),
     h("div", { class: "arcbar" }, h("span", { class: "fl" }, "Jenis"), arcChips, arcCount),
-    arcList));
+    arcList),
+  h("div", { class: "band" }));
 
 // Detail item: #item/<slug>. Satu halaman per info, bisa dibagikan lewat tautan.
 const dCur = h("span"), dTitle = h("h1"), dSub = h("p"), dTags = h("div", { class: "dtags" });
@@ -349,6 +354,7 @@ const vDetail = h("section", { hidden: "" },
   h("div", { class: "phead dphead" }, h("div", { class: "wrap" },
     h("div", { class: "crumbs" }, h("a", { href: "#beranda" }, "Beranda"), h("span", {}, "/"), h("a", { href: "#cari" }, "Katalog"), h("span", {}, "/"), dCur),
     dTitle, dSub, dTags)),
+  h("div", { class: "band" }),
   h("div", { class: "wrap" }, h("div", { class: "dwrap" }, dBody, dSide)));
 
 function fact(label: string, value: string): HTMLElement[] { return [h("b", {}, label), h("span", {}, value)]; }
