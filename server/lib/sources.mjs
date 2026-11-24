@@ -77,12 +77,38 @@ export async function fetchDocument(url, { llm } = {}) {
   const kind = classify(url);
 
   if (kind === "instagram") {
-    const res = await safeFetch(`https://r.jina.ai/${url}`, { accept: "text/plain", timeoutMs: 25000, maxBytes: 3 * 1024 * 1024 });
-    const text = res.buffer.toString("utf8");
-    if (res.status !== 200 || text.length < 200 || /login|masuk/i.test(text.slice(0, 300)) && text.length < 800) {
-      throw new Error("post Instagram tidak bisa dibaca tanpa login");
+    const code = (url.match(/\/(?:p|reel|tv)\/([A-Za-z0-9_-]+)/) || [])[1];
+    if (!code) throw new Error("shortcode Instagram tidak ditemukan");
+    let caption = "";
+    let thumb = null;
+    let author = "";
+    try {
+      const oe = await safeFetch(`https://www.instagram.com/api/v1/oembed/?url=https://www.instagram.com/p/${code}/`, {
+        accept: "application/json", timeoutMs: 15000, maxBytes: 1024 * 1024,
+      });
+      if (oe.status === 200) {
+        const j = JSON.parse(oe.buffer.toString("utf8"));
+        caption = String(j.title || "").trim();
+        thumb = j.thumbnail_url || null;
+        author = String(j.author_name || "");
+      }
+    } catch { /* lanjut ke OCR kalau ada gambar */ }
+
+    // OCR poster di dalam post (kalau thumbnail bisa diunduh)
+    let ocr = "";
+    if (thumb) {
+      try {
+        const img = await safeFetch(thumb, { timeoutMs: 20000, maxBytes: 8 * 1024 * 1024 });
+        if (img.status === 200 && /^image\//.test(img.contentType || "")) {
+          if (!llm) throw new Error("butuh model vision untuk membaca poster Instagram");
+          ocr = await llm.visionText(img.buffer, img.contentType);
+        }
+      } catch { /* caption saja tetap dipakai */ }
     }
-    return { text: text.slice(0, 12000), kind, imageUrl: null };
+
+    const text = [caption, author ? `Akun: @${author}` : "", ocr].filter(Boolean).join("\n\n").slice(0, 12000);
+    if (text.length < 60) throw new Error("isi post Instagram tidak bisa dibaca (login-gated)");
+    return { text, kind, imageUrl: thumb || undefined };
   }
 
   if (kind === "gdrive") {
