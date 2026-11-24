@@ -1,0 +1,60 @@
+[
+  {
+    "name": "Detik Edukasi — Beasiswa",
+    "url": "https://www.detik.com/edu/beasiswa/rss",
+    "type": "rss",
+    "j": "Beasiswa",
+    "tier": "T2",
+    "intervalHours": 6
+  },
+  {
+    "name": "Detik Edukasi",
+    "url": "https://www.detik.com/edu/rss",
+    "type": "rss",
+    "j": "Lomba",
+    "tier": "T2",
+    "intervalHours": 6
+  },
+  {
+    "name": "CNN Indonesia Edukasi",
+    "url": "https://www.cnnindonesia.com/edukasi/rss",
+    "type": "rss",
+    "j": "Beasiswa",
+    "tier": "T2",
+    "intervalHours": 6
+  },
+  {
+    "name": "Beasiswa.id",
+    "url": "https://beasiswa.id/feed/",
+    "type": "rss",
+    "j": "Beasiswa",
+    "tier": "T2",
+    "intervalHours": 6
+  },
+  {
+    "name": "LPDP",
+    "url": "https://lpdp.kemenkeu.go.id/feed/",
+    "type": "rss",
+    "j": "Beasiswa",
+    "tier": "T1",
+    "intervalHours": 12
+  },
+  {
+    "name": "Kemdiktisaintek — Pengumuman",
+    "url": "https://kemdiktisaintek.go.id/announcement",
+    "type": "listing",
+    "j": "Lomba",
+    "tier": "T1",
+    "intervalHours": 12,
+    "linkPattern": "(gemastik|pimnas|pkm|kompetisi|lomba|olimpiade|kmi|kdi|mahasiswa)"
+  },
+  {
+    "name": "KIP Kuliah",
+    "url": "https://kip-kuliah.kemdiktisaintek.go.id/",
+    "type": "listing",
+    "j": "Beasiswa",
+    "tier": "T1",
+    "intervalHours": 24,
+    "linkPattern": "(pengumuman|pendaftaran|syarat|jadwal|beasiswa)"
+  }
+]

@@ -512,6 +512,26 @@ function route(): void {
   window.scrollTo(0, 0); paint();
 }
 
+/* ---------- data dari API ---------- */
+// Katalog utama datang dari /api/katalog (hasil pipeline). Kalau API tidak bisa
+// dihubungi, DATA yang dibundel tetap dipakai supaya situs jalan offline.
+async function syncRemote(): Promise<void> {
+  try {
+    const res = await fetch("/api/katalog", { headers: { accept: "application/json" } });
+    if (!res.ok) return;
+    const body = await res.json() as { items?: Item[] };
+    const items = Array.isArray(body.items) ? body.items : [];
+    if (items.length < 1) return;
+    DATA.length = 0;
+    DATA.push(...items);
+    BYSLUG.clear();
+    for (const x of DATA) BYSLUG.set(slugOf(x.n), x);
+    BID.length = 0;
+    for (const b of Array.from(new Set(DATA.map(x => x.b)))) BID.push(b);
+    route();
+  } catch { /* offline: bundel lokal */ }
+}
+
 /* ---------- init ---------- */
 function init(): void {
   document.documentElement.style.setProperty("--hmti", "url(" + HM + ")");
@@ -536,6 +556,7 @@ function init(): void {
   yNext.addEventListener("click", () => { st.year = Math.min(YEAR0 + 3, st.year + 1); paint(); });
   hs.addEventListener("submit", e => { e.preventDefault(); st.q = hq.value.trim().slice(0, 100); q.value = st.q; mode = "biasa"; if (location.hash === "#cari") route(); else location.hash = "#cari"; });
   window.addEventListener("hashchange", route);
+  void syncRemote();
   document.getElementById("app")!.replaceChildren(nav, h("main", {}, vBeranda, vCat, vArsip, vDetail), foot);
   route();
 
