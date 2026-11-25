@@ -22,7 +22,7 @@ ADMIN_TOKEN=...                # Bearer untuk review & tambah URL manual
 DISCOVERY_LLM_URL=https://doomps.web.id/v1/chat/completions
 DISCOVERY_LLM_KEY=...
 DISCOVERY_LLM_MODEL=fp/deepseek-v4.1-flash
-DISCOVERY_VISION_MODEL=dai/qwen3.8-flash   # OCR poster / IG
+DISCOVERY_VISION_MODEL=hmti-v1.0   # OCR poster / IG
 DISCOVERY_ENABLED=1            # 0 = kill switch
 PWK_PORT=8098
 MAX_ITEMS_PER_RUN=12
