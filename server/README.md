@@ -12,7 +12,9 @@ node server/index.mjs          # API + situs di http://127.0.0.1:8098
 
 Sebagai layanan: `systemctl --user status pwk-katalog` (unit di `~/.config/systemd/user/pwk-katalog.service`).
 
-Konfigurasi dibaca dari `/data/workspace/pwk-data/env` (mode 600):
+Konfigurasi dibaca dari `/data/workspace/pwk-data/env` (mode 600). Daftar kunci
+yang dipakai ada di `.env.example` di root repo; salin lalu isi bagian rahasianya
+(`CRON_SECRET`, `ADMIN_TOKEN`, `DISCOVERY_LLM_KEY`) di server, jangan di repo.
 
 ```
 CRON_SECRET=...                # Bearer untuk cron-job.org
