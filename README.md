@@ -29,7 +29,24 @@ Status pendaftaran dihitung sendiri dari tanggal, tanpa admin mengubahnya manual
 - Pengecekan ulang berjalan tiap menit dan setiap tab kembali aktif, jadi status ikut berubah tanpa reload.
 - Di halaman Cari, info kedaluwarsa masih bisa ditemukan (misalnya untuk melihat periode lalu), tetapi tombol pendaftarannya nonaktif.
 
-Untuk menambah info baru cukup isi `nama`, `dl` (tenggat) di `DATA` pada `src/app.ts`. Info yang belum punya `dl` diberi status `Tanggal belum diverifikasi`: tetap tampil di katalog, tetapi tidak bisa masuk arsip dan tidak dihitung sebagai "aktif" pada statistik beranda. Jumlah info tanpa tanggal ditampilkan apa adanya di beranda.
+Untuk menambah info baru cukup isi `nama`, `dl` (tenggat), dan untuk lomba `k` (kategori) di `DATA` pada `src/app.ts`. Info yang belum punya `dl` diberi status `Tanggal belum ada`: tetap tampil di katalog, tetapi tidak bisa masuk arsip dan tidak dihitung sebagai "aktif" pada statistik beranda. Jumlah info tanpa tanggal ditampilkan apa adanya di beranda.
+
+## Kategori lomba
+
+Setiap entri ber-`j: "Lomba"` wajib punya `k`, yaitu `"Akademik"` atau `"Nonakademik"`:
+
+- **Akademik** — kompetisi berbasis keilmuan, riset, atau karya tulis (PIMNAS, PKM, GEMASTIK, KDMI, IISE).
+- **Nonakademik** — kompetisi keterampilan, kewirausahaan, atau minat-bakat (KMI Expo, Hult Prize, Google Solution Challenge, Shell Eco-marathon).
+
+Kategori tampil sebagai label di kartu, baris, dan halaman detail, serta bisa disaring lewat tab **Semua kategori / Akademik / Nonakademik** di halaman Info Lomba. Beasiswa tidak punya kategori. Saat `npm run dev`, konsol memberi peringatan bila ada lomba yang lupa diberi `k`.
+
+## Contact person
+
+Footer punya blok **CONTACT PERSON** yang datanya diatur di objek `CP` pada `src/app.ts` (nama, jabatan/divisi, `ig`, `email`). Email dirender sebagai tautan `mailto:` dan Instagram sebagai tautan keluar. Nomor telepon sengaja tidak dicantumkan karena belum ada data resmi; isi `nama` dengan nama pengurus yang bisa dihubungi.
+
+## Nama divisi
+
+Tampilan memakai nama resmi **Pengembangan Wawasan Keilmuan FT-UMB** (konstanta `DIV`), bukan singkatan. Nama itu muncul di navbar, hero beranda, footer, serta metadata `index.html` dan `manifest.webmanifest`. Singkatan lama hanya tersimpan di komentar kode dan ID internal berkas `.ics`, tidak pernah dirender ke pengguna.
 
 ## Halaman detail
 

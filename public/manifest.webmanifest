@@ -1,7 +1,7 @@
 {
   "name": "Lomba & Beasiswa TI — HMTI FT-UMB",
   "short_name": "Lomba TI",
-  "description": "Katalog lomba dan beasiswa untuk mahasiswa Teknik Industri, Divisi PWK HMTI FT-UMB.",
+  "description": "Katalog lomba dan beasiswa untuk mahasiswa Teknik Industri, Divisi Pengembangan Wawasan Keilmuan FT-UMB, HMTI FT-UMB.",
   "start_url": "/#beranda",
   "scope": "/",
   "display": "standalone",
