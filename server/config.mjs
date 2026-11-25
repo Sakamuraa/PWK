@@ -1,7 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const DATA_DIR = process.env.PWK_DATA_DIR || "/data/workspace/pwk-data";
+// semua path default relatif ke root repo, supaya siapa pun bisa clone lalu jalan
+// tanpa mengubah apa pun. Data runtime disimpan di .pwk-data/ (masuk .gitignore).
+export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const DATA_DIR = process.env.PWK_DATA_DIR || path.join(ROOT, ".pwk-data");
 fs.mkdirSync(DATA_DIR, { recursive: true });
 
 // muat env sederhana (KEY=VALUE) dari folder data, tanpa dependensi
@@ -22,8 +26,8 @@ export const CFG = {
   dbPath: process.env.PWK_DB || path.join(DATA_DIR, "pwk.db"),
   port: num(process.env.PWK_PORT, 8098),
   host: process.env.PWK_HOST || "127.0.0.1",
-  staticDir: process.env.PWK_STATIC || "/data/workspace/PWK/dist",
-  fallbackJson: process.env.PWK_FALLBACK || "/data/workspace/PWK/public/data/katalog.json",
+  staticDir: process.env.PWK_STATIC || path.join(ROOT, "dist"),
+  fallbackJson: process.env.PWK_FALLBACK || path.join(ROOT, "public/data/katalog.json"),
 
   cronSecret: process.env.CRON_SECRET || "",
   adminToken: process.env.ADMIN_TOKEN || "",

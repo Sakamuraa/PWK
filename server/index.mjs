@@ -2,7 +2,7 @@ import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
-import { CFG } from "./config.mjs";
+import { CFG, ROOT } from "./config.mjs";
 import {
   listKatalog, getItem, listDrafts, setStatus, counts, lastRun, saveLaporan, countLaporan,
   seedIfEmpty, stateGet,
@@ -10,8 +10,9 @@ import {
 import { runPipeline, addManual, isLocked } from "./lib/pipeline.mjs";
 import { loadSources } from "./lib/sources.mjs";
 import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
-const pkgVersion = (() => { try { return JSON.parse(readFileSync("/data/workspace/PWK/package.json", "utf8")).version; } catch { return "0.0.0"; } })();
+const pkgVersion = (() => { try { return JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")).version; } catch { return "0.0.0"; } })();
 
 seedIfEmpty();
 

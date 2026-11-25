@@ -2,7 +2,8 @@
 
 Server Node.js kecil yang menyalakan tiga hal sekaligus: situs PWK (hasil build Vite di `dist/`), API katalog, dan pipeline yang mencari lomba/beasiswa baru, memfilter, lalu menerbitkannya.
 
-Tidak ada dependensi layanan luar selain LLM (router OpenAI-compatible). Database memakai SQLite bawaan Node (`node:sqlite`), file di `/data/workspace/pwk-data/pwk.db`.
+Tidak ada dependensi layanan luar selain LLM (router OpenAI-compatible). Database memakai SQLite bawaan Node (`node:sqlite`), file di `<PWK_DATA_DIR>/pwk.db`
+(default `<repo>/.pwk-data/pwk.db`, tidak ikut repo).
 
 ## Menjalankan
 
@@ -12,7 +13,8 @@ node server/index.mjs          # API + situs di http://127.0.0.1:8098
 
 Sebagai layanan: `systemctl --user status pwk-katalog` (unit di `~/.config/systemd/user/pwk-katalog.service`).
 
-Konfigurasi dibaca dari `/data/workspace/pwk-data/env` (mode 600). Daftar kunci
+Konfigurasi dibaca dari `<PWK_DATA_DIR>/env` (mode 600); default `<repo>/.pwk-data`,
+dibuat otomatis saat pertama jalan. Daftar kunci
 yang dipakai ada di `.env.example` di root repo; salin lalu isi bagian rahasianya
 (`CRON_SECRET`, `ADMIN_TOKEN`, `DISCOVERY_LLM_KEY`) di server, jangan di repo.
 
