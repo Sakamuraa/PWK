@@ -5,7 +5,7 @@
     "type": "rss",
     "j": "Beasiswa",
     "tier": "T2",
-    "intervalHours": 6
+    "intervalHours": 1
   },
   {
     "name": "Detik Edukasi",
@@ -13,7 +13,7 @@
     "type": "rss",
     "j": "Lomba",
     "tier": "T2",
-    "intervalHours": 6
+    "intervalHours": 1
   },
   {
     "name": "CNN Indonesia Edukasi",
@@ -21,7 +21,7 @@
     "type": "rss",
     "j": "Beasiswa",
     "tier": "T2",
-    "intervalHours": 6
+    "intervalHours": 1
   },
   {
     "name": "Beasiswa.id",
@@ -29,7 +29,7 @@
     "type": "rss",
     "j": "Beasiswa",
     "tier": "T2",
-    "intervalHours": 6
+    "intervalHours": 1
   },
   {
     "name": "LPDP",
@@ -37,7 +37,7 @@
     "type": "rss",
     "j": "Beasiswa",
     "tier": "T1",
-    "intervalHours": 12
+    "intervalHours": 1
   },
   {
     "name": "Kemdiktisaintek — Pengumuman",
