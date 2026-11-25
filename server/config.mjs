@@ -30,8 +30,8 @@ export const CFG = {
 
   llmUrl: process.env.DISCOVERY_LLM_URL || "https://doomps.web.id/v1/chat/completions",
   llmKey: process.env.DISCOVERY_LLM_KEY || "",
-  llmModel: process.env.DISCOVERY_LLM_MODEL || "dv/gemini-3.0-flash-high",
-  visionModel: process.env.DISCOVERY_VISION_MODEL || "dv/gemini-3.0-flash-high",
+  llmModel: process.env.DISCOVERY_LLM_MODEL || "hmti-v1.0",
+  visionModel: process.env.DISCOVERY_VISION_MODEL || "hmti-v1.0vl",
 
   enabled: (process.env.DISCOVERY_ENABLED ?? "1") !== "0",
   maxItemsPerRun: num(process.env.MAX_ITEMS_PER_RUN, 12),
