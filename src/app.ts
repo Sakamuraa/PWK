@@ -1,5 +1,5 @@
 "use strict";
-// Katalog Lomba & Beasiswa TI - HMTI FT-UMB (Divisi Pengembangan Wawasan Keilmuan FT-UMB)
+// Katalog Lomba & Beasiswa TI - Divisi Pengembangan Wawasan Keilmuan HMTI FT-UMB
 // Seluruh tampilan dibangun dari kode ini. HTML hanya kerangka kosong (#app).
 // Tambah/ubah info lewat DATA dan REQ di bawah.
 
@@ -32,7 +32,7 @@ interface Why { v: Verdict; t: string }
 const HM = "/IMG_4190.PNG";
 const UM = "/LOGO UMB_WARNA OPSI 2.png";
 // Nama resmi divisi. Semua tampilan memakai nama lengkap, bukan singkatan.
-const DIV = "Pengembangan Wawasan Keilmuan FT-UMB";
+const DIV = "Pengembangan Wawasan Keilmuan";
 
 const DATA: Item[] = [
 {n:"PIMNAS (hasil PKM)",k:"Akademik",j:"Lomba",t:"Nasional",b:"Riset & Inovasi",o:"Kemdiktisaintek",d:"Pekan Ilmiah Mahasiswa Nasional untuk tim lolos pendanaan PKM.",tg:"PIMNAS ke-39: 2–7 Nov 2026 di UNDIP Semarang. Peserta dari tim PKM yang lolos pendanaan."},
@@ -464,7 +464,7 @@ function paintDetail(x: Item): void {
 // Nomor telepon tidak dicantumkan karena belum ada data resmi.
 const CP = {
   nama: "HIMPUNAN MAHASISWA TEKNIK INDUSTRI",   // nama/nomor yang ditampilkan sebagai CP
-  jabatan: "Divisi " + DIV + ", HMTI FT-UMB",
+  jabatan: "Divisi " + DIV + " HMTI FT-UMB",
   ig: "hmti.umb",
   email: "ardhayya03@gmail.com",
 };
