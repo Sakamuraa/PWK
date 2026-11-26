@@ -1,8 +1,9 @@
 {
-  "updated": "2026-11-24T17:56:44.030Z",
+  "updated": "2026-11-26T00:31:28.593Z",
   "items": [
     {
       "n": "PIMNAS (hasil PKM)",
+      "k": "Akademik",
       "j": "Lomba",
       "t": "Nasional",
       "b": "Riset & Inovasi",
@@ -15,11 +16,12 @@
       "source_url": "",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.027Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
       "n": "PKM (Program Kreativitas Mahasiswa)",
+      "k": "Akademik",
       "j": "Lomba",
       "t": "Nasional",
       "b": "Riset & Inovasi",
@@ -32,7 +34,7 @@
       "source_url": "",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
@@ -40,6 +42,7 @@
       "u": "https://kemdiktisaintek.go.id/announcement/article/penawaran-gemastik-2026",
       "op": "2026-07-27",
       "dl": "2026-08-17",
+      "k": "Akademik",
       "j": "Lomba",
       "t": "Nasional",
       "b": "Teknologi & Data",
@@ -52,11 +55,12 @@
       "source_url": "https://kemdiktisaintek.go.id/announcement/article/penawaran-gemastik-2026",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
       "n": "KMI Expo",
+      "k": "Nonakademik",
       "j": "Lomba",
       "t": "Nasional",
       "b": "Bisnis & Kewirausahaan",
@@ -69,11 +73,12 @@
       "source_url": "",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
       "n": "KDMI (Debat Mahasiswa Indonesia)",
+      "k": "Akademik",
       "j": "Lomba",
       "t": "Nasional",
       "b": "Umum",
@@ -86,12 +91,13 @@
       "source_url": "",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
       "n": "IISE Student Competitions",
       "dl": "2027-01-17",
+      "k": "Akademik",
       "j": "Lomba",
       "t": "Internasional",
       "b": "Teknik Industri",
@@ -105,12 +111,13 @@
       "source_url": "https://www.iise.org",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
       "n": "Hult Prize",
       "dl": "2027-02-28",
+      "k": "Nonakademik",
       "j": "Lomba",
       "t": "Internasional",
       "b": "Bisnis & Kewirausahaan",
@@ -124,12 +131,13 @@
       "source_url": "https://www.hultprize.org",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
       "n": "Google Solution Challenge",
       "u": "https://developers.google.com/community/gdsc-solution-challenge",
+      "k": "Nonakademik",
       "j": "Lomba",
       "t": "Internasional",
       "b": "Teknologi & Data",
@@ -142,13 +150,14 @@
       "source_url": "https://developers.google.com/community/gdsc-solution-challenge",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
       "n": "Shell Eco-marathon",
       "op": "2026-09-21",
       "dl": "2026-12-08",
+      "k": "Nonakademik",
       "j": "Lomba",
       "t": "Internasional",
       "b": "Rekayasa & Manufaktur",
@@ -161,7 +170,7 @@
       "source_url": "",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
@@ -180,7 +189,7 @@
       "source_url": "https://kip-kuliah.kemdiktisaintek.go.id/",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
@@ -199,7 +208,7 @@
       "source_url": "https://lpdp.kemenkeu.go.id",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
@@ -219,7 +228,7 @@
       "source_url": "",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
@@ -240,7 +249,7 @@
       "source_url": "https://register.djarumbeasiswaplus.org/",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
@@ -261,7 +270,7 @@
       "source_url": "https://www.bca.co.id/id/tentang-bca/CSR/Bakti-BCA/bakti-pendidikan/beasiswa-bakti-bca",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
@@ -282,7 +291,7 @@
       "source_url": "https://www.tanotofoundation.org/",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
@@ -300,7 +309,7 @@
       "source_url": "",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
@@ -321,7 +330,7 @@
       "source_url": "https://www.chevening.org",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
@@ -341,7 +350,7 @@
       "source_url": "https://www.aminef.or.id",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
@@ -360,7 +369,7 @@
       "source_url": "https://www.studyinjapan.go.jp",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
@@ -379,7 +388,7 @@
       "source_url": "https://www.studyinkorea.go.kr/",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
@@ -398,7 +407,7 @@
       "source_url": "https://www.daad.de/en/",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
@@ -419,7 +428,7 @@
       "source_url": "https://www.australiaawards.gov.au",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
@@ -438,7 +447,7 @@
       "source_url": "https://erasmus-plus.ec.europa.eu",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
@@ -459,7 +468,7 @@
       "source_url": "https://turkiyeburslari.gov.tr/",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     },
     {
@@ -479,7 +488,7 @@
       "source_url": "https://www.csc.edu.cn/",
       "confidence": 100,
       "content_hash": "",
-      "last_verified_at": "2026-11-24T17:56:44.028Z",
+      "last_verified_at": "2026-11-26T00:31:28.593Z",
       "discovered_by": "seed"
     }
   ]

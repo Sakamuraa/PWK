@@ -1,10 +1,13 @@
 "use strict";
-// Katalog Lomba & Beasiswa TI - HMTI FT-UMB (Divisi PWK)
+// Katalog Lomba & Beasiswa TI - HMTI FT-UMB (Divisi Pengembangan Wawasan Keilmuan FT-UMB)
 // Seluruh tampilan dibangun dari kode ini. HTML hanya kerangka kosong (#app).
 // Tambah/ubah info lewat DATA dan REQ di bawah.
 
 type Jenis = "Lomba" | "Beasiswa";
 type Tingkat = "Kampus" | "Nasional" | "Internasional";
+// Kategori lomba. Akademik: keilmuan/riset/karya tulis. Nonakademik: keterampilan,
+// kewirausahaan, dan minat-bakat. Wajib diisi untuk setiap entri ber-jenis "Lomba".
+type Kat = "Akademik" | "Nonakademik";
 type Route = "beranda" | "cari" | "lomba" | "beasiswa" | "arsip";
 type Verdict = "ok" | "cek" | "no";
 type Status = "buka" | "segera" | "belum" | "ditutup" | "tbd";
@@ -15,6 +18,7 @@ interface Req { ipkMin?: number; semMin?: number; semMax?: number; lulusS1?: boo
 interface Item {
   n: string; j: Jenis; t: Tingkat; b: string; o: string; d: string;
   tg: string;            // catatan tanggal manual, kosong = "cek situs resmi"
+  k?: Kat;               // kategori lomba (wajib untuk j:"Lomba", kosong untuk beasiswa)
   dl?: string;           // tenggat: "2026-12-31" (akhir hari WIB) atau ISO lengkap "2026-10-06T11:00:00Z"
   op?: string;           // tanggal pendaftaran dibuka (opsional, format sama)
   u?: string;            // tautan resmi (wajib https)
@@ -27,17 +31,19 @@ interface Why { v: Verdict; t: string }
 
 const HM = "/IMG_4190.PNG";
 const UM = "/LOGO UMB_WARNA OPSI 2.png";
+// Nama resmi divisi. Semua tampilan memakai nama lengkap, bukan singkatan.
+const DIV = "Pengembangan Wawasan Keilmuan FT-UMB";
 
 const DATA: Item[] = [
-{n:"PIMNAS (hasil PKM)",j:"Lomba",t:"Nasional",b:"Riset & Inovasi",o:"Kemdiktisaintek",d:"Pekan Ilmiah Mahasiswa Nasional untuk tim lolos pendanaan PKM.",tg:"PIMNAS ke-39: 2–7 Nov 2026 di UNDIP Semarang. Peserta dari tim PKM yang lolos pendanaan."},
-{n:"PKM (Program Kreativitas Mahasiswa)",j:"Lomba",t:"Nasional",b:"Riset & Inovasi",o:"Kemdiktisaintek",d:"Skema riset, pengabdian, kewirausahaan, karsa cipta. Seleksi dimulai dari kampus.",tg:"Jadwal PKM 2027 belum terbit. Unggah proposal biasanya sekitar Februari."},
-{n:"GEMASTIK",u:"https://kemdiktisaintek.go.id/announcement/article/penawaran-gemastik-2026",op:"2026-07-27",dl:"2026-08-17",j:"Lomba",t:"Nasional",b:"Teknologi & Data",o:"Kemdiktisaintek",d:"Pagelaran mahasiswa nasional bidang TIK: data mining, pemrograman, desain, dll.",tg:"GEMASTIK XIX 2026: pendaftaran 27 Jul–17 Agu 2026. Edisi 2027 belum diumumkan."},
-{n:"KMI Expo",j:"Lomba",t:"Nasional",b:"Bisnis & Kewirausahaan",o:"Kemdiktisaintek",d:"Ajang pameran dan seleksi usaha mahasiswa.",tg:"KMI Expo XVII: 29 Sep–1 Okt 2026 di UNSOED. Peserta lewat seleksi P2MW."},
-{n:"KDMI (Debat Mahasiswa Indonesia)",j:"Lomba",t:"Nasional",b:"Umum",o:"Kemdiktisaintek",d:"Kompetisi debat mahasiswa tingkat nasional.",tg:"Jadwal KDMI nasional belum terbit di situs resmi. Cek pengumuman kampus."},
-{n:"IISE Student Competitions",dl:"2027-01-17",j:"Lomba",t:"Internasional",b:"Teknik Industri",o:"Institute of Industrial and Systems Engineers",d:"Kompetisi mahasiswa seputar industrial & systems engineering.",tg:"IISE 2027: abstrak 15 Nov 2026, full paper 17 Jan 2027, pendaftaran pembicara 7 Mar 2027.",u:"https://www.iise.org"},
-{n:"Hult Prize",dl:"2027-02-28",j:"Lomba",t:"Internasional",b:"Bisnis & Kewirausahaan",o:"Hult Prize Foundation",d:"Kompetisi social enterprise untuk tim mahasiswa, seleksi berjenjang dari kampus.",tg:"Hult Prize 2027: pendaftaran tutup 28 Feb 2027. Babak kampus selesai 15 Feb 2027.",u:"https://www.hultprize.org"},
-{n:"Google Solution Challenge",u:"https://developers.google.com/community/gdsc-solution-challenge",j:"Lomba",t:"Internasional",b:"Teknologi & Data",o:"Google Developer Groups",d:"Bangun solusi teknologi untuk tujuan SDGs.",tg:"Edisi 2027 belum diumumkan. Biasanya dibuka sekitar Feb–Mar."},
-{n:"Shell Eco-marathon",op:"2026-09-21",dl:"2026-12-08",j:"Lomba",t:"Internasional",b:"Rekayasa & Manufaktur",o:"Shell",d:"Rancang kendaraan hemat energi. Ada regional Asia.",tg:"Fase teknis 2027: 21 Sep–8 Des 2026. Event APME Qatar dibatalkan."},
+{n:"PIMNAS (hasil PKM)",k:"Akademik",j:"Lomba",t:"Nasional",b:"Riset & Inovasi",o:"Kemdiktisaintek",d:"Pekan Ilmiah Mahasiswa Nasional untuk tim lolos pendanaan PKM.",tg:"PIMNAS ke-39: 2–7 Nov 2026 di UNDIP Semarang. Peserta dari tim PKM yang lolos pendanaan."},
+{n:"PKM (Program Kreativitas Mahasiswa)",k:"Akademik",j:"Lomba",t:"Nasional",b:"Riset & Inovasi",o:"Kemdiktisaintek",d:"Skema riset, pengabdian, kewirausahaan, karsa cipta. Seleksi dimulai dari kampus.",tg:"Jadwal PKM 2027 belum terbit. Unggah proposal biasanya sekitar Februari."},
+{n:"GEMASTIK",u:"https://kemdiktisaintek.go.id/announcement/article/penawaran-gemastik-2026",op:"2026-07-27",dl:"2026-08-17",k:"Akademik",j:"Lomba",t:"Nasional",b:"Teknologi & Data",o:"Kemdiktisaintek",d:"Pagelaran mahasiswa nasional bidang TIK: data mining, pemrograman, desain, dll.",tg:"GEMASTIK XIX 2026: pendaftaran 27 Jul–17 Agu 2026. Edisi 2027 belum diumumkan."},
+{n:"KMI Expo",k:"Nonakademik",j:"Lomba",t:"Nasional",b:"Bisnis & Kewirausahaan",o:"Kemdiktisaintek",d:"Ajang pameran dan seleksi usaha mahasiswa.",tg:"KMI Expo XVII: 29 Sep–1 Okt 2026 di UNSOED. Peserta lewat seleksi P2MW."},
+{n:"KDMI (Debat Mahasiswa Indonesia)",k:"Akademik",j:"Lomba",t:"Nasional",b:"Umum",o:"Kemdiktisaintek",d:"Kompetisi debat mahasiswa tingkat nasional.",tg:"Jadwal KDMI nasional belum terbit di situs resmi. Cek pengumuman kampus."},
+{n:"IISE Student Competitions",dl:"2027-01-17",k:"Akademik",j:"Lomba",t:"Internasional",b:"Teknik Industri",o:"Institute of Industrial and Systems Engineers",d:"Kompetisi mahasiswa seputar industrial & systems engineering.",tg:"IISE 2027: abstrak 15 Nov 2026, full paper 17 Jan 2027, pendaftaran pembicara 7 Mar 2027.",u:"https://www.iise.org"},
+{n:"Hult Prize",dl:"2027-02-28",k:"Nonakademik",j:"Lomba",t:"Internasional",b:"Bisnis & Kewirausahaan",o:"Hult Prize Foundation",d:"Kompetisi social enterprise untuk tim mahasiswa, seleksi berjenjang dari kampus.",tg:"Hult Prize 2027: pendaftaran tutup 28 Feb 2027. Babak kampus selesai 15 Feb 2027.",u:"https://www.hultprize.org"},
+{n:"Google Solution Challenge",u:"https://developers.google.com/community/gdsc-solution-challenge",k:"Nonakademik",j:"Lomba",t:"Internasional",b:"Teknologi & Data",o:"Google Developer Groups",d:"Bangun solusi teknologi untuk tujuan SDGs.",tg:"Edisi 2027 belum diumumkan. Biasanya dibuka sekitar Feb–Mar."},
+{n:"Shell Eco-marathon",op:"2026-09-21",dl:"2026-12-08",k:"Nonakademik",j:"Lomba",t:"Internasional",b:"Rekayasa & Manufaktur",o:"Shell",d:"Rancang kendaraan hemat energi. Ada regional Asia.",tg:"Fase teknis 2027: 21 Sep–8 Des 2026. Event APME Qatar dibatalkan."},
 {n:"KIP Kuliah",u:"https://kip-kuliah.kemdiktisaintek.go.id/",j:"Beasiswa",t:"Nasional",b:"Umum",o:"Pemerintah RI",d:"Bantuan biaya pendidikan untuk mahasiswa berprestasi dari keluarga kurang mampu.",tg:"KIP Kuliah 2026: akun siswa 3 Feb–11 Nov 2026. Jadwal 2027 belum diumumkan.",jen:"S1"},
 {n:"LPDP",j:"Beasiswa",t:"Internasional",b:"Umum",o:"Kemenkeu RI",d:"Beasiswa S2/S3 dalam dan luar negeri.",tg:"LPDP 2027 belum dibuka, tanggal belum diumumkan. Co-funding berjalan s.d. 1 Des 2026.",jen:"S2/S3",u:"https://lpdp.kemenkeu.go.id"},
 {n:"Beasiswa Unggulan",op:"2026-08-20",dl:"2026-08-24",j:"Beasiswa",t:"Nasional",b:"Umum",o:"Kemdiktisaintek",d:"Untuk mahasiswa berprestasi, jenjang sarjana hingga doktor.",tg:"Beasiswa Unggulan 2026: 20–24 Agu 2026. Jadwal 2027 belum terbit.",jen:"S1/S2/S3"},
@@ -56,7 +62,13 @@ const DATA: Item[] = [
 {n:"Chinese Government Scholarship (CSC)",dl:"2027-02-14",u:"https://www.csc.edu.cn/",j:"Beasiswa",t:"Internasional",b:"Umum",o:"China Scholarship Council",d:"Beasiswa studi di universitas China.",tg:"CSC 2027/2028 jalur Kedutaan China: berkas paling lambat 14 Feb 2027.",jen:"S1/S2/S3"}
 ];
 
-// Syarat INDIKATIF, belum diverifikasi PWK. Cek pedoman resmi sebelum mendaftar.
+// Saat pengembangan: ingatkan bila ada lomba yang belum diberi kategori.
+if (!import.meta.env.PROD) {
+  const tanpaKat = DATA.filter(x => x.j === "Lomba" && !x.k).map(x => x.n);
+  if (tanpaKat.length) console.warn("Lomba tanpa kategori:", tanpaKat.join(", "));
+}
+
+// Syarat INDIKATIF, belum diverifikasi pengurus divisi. Cek pedoman resmi sebelum mendaftar.
 const REQ: Record<string, Req> = {
   "KIP Kuliah": { ekonomi: true },
   "LPDP": { lulusS1: true, ipkMin: 3 },
@@ -96,7 +108,7 @@ function icsOf(x: Item): string | null {
   if (!r) return null;
   const stamp = utc(Date.now());
   const lines = [
-    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//PWK HMTI FT-UMB//Katalog Lomba Beasiswa//ID", "CALSCALE:GREGORIAN",
+    "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//HMTI FT-UMB//Katalog Lomba Beasiswa//ID", "CALSCALE:GREGORIAN",
     "BEGIN:VEVENT", "UID:" + slugOf(x.n) + "-" + stamp + "@pwk-hmti", "DTSTAMP:" + stamp,
     "DTSTART:" + utc(r[0]), "DTEND:" + utc(r[1]),
     "SUMMARY:" + icsEsc(x.n + " - pendaftaran ditutup"),
@@ -130,12 +142,16 @@ function load<T>(key: string, ok: (v: unknown) => v is T, fallback: T): T {
 function save(key: string, v: unknown): void { try { localStorage.setItem(key, JSON.stringify(v)); } catch { /* storage dimatikan */ } }
 const num = (s: string): number | null => { const n = parseFloat(s.replace(",", ".")); return Number.isFinite(n) ? n : null; };
 const NS = "http://www.w3.org/2000/svg";
-function icon(name: "sliders" | "bookmark"): SVGSVGElement {
+function icon(name: "sliders" | "bookmark" | "mail" | "ig"): SVGSVGElement {
   const s = document.createElementNS(NS, "svg");
   for (const [k, v] of Object.entries({ viewBox: "0 0 24 24", width: "22", height: "22", fill: "none", stroke: "currentColor", "stroke-width": "1.8", "stroke-linecap": "round", "stroke-linejoin": "round", "aria-hidden": "true" })) s.setAttribute(k, v);
-  const paths = name === "bookmark" ? ["M6 3h12v18l-6-4-6 4z"] : ["M3 6h9", "M16 6h5", "M3 12h3", "M10 12h11", "M3 18h11", "M18 18h3"];
+  const paths = name === "bookmark" ? ["M6 3h12v18l-6-4-6 4z"]
+    : name === "mail" ? ["M3 6h18v12H3z", "M3 7l9 6 9-6"]
+    : name === "ig" ? ["M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4z", "M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z"]
+    : ["M3 6h9", "M16 6h5", "M3 12h3", "M10 12h11", "M3 18h11", "M18 18h3"];
   for (const d of paths) { const p = document.createElementNS(NS, "path"); p.setAttribute("d", d); s.append(p); }
   if (name === "sliders") for (const [cx, cy] of [[14, 6], [8, 12], [16, 18]]) { const c = document.createElementNS(NS, "circle"); c.setAttribute("cx", String(cx)); c.setAttribute("cy", String(cy)); c.setAttribute("r", "2"); s.append(c); }
+  if (name === "ig") { const c = document.createElementNS(NS, "circle"); c.setAttribute("cx", "17.2"); c.setAttribute("cy", "6.8"); c.setAttribute("r", "0.9"); c.setAttribute("fill", "currentColor"); s.append(c); }
   return s;
 }
 const MON = ["JAN", "FEB", "MAR", "APR", "MEI", "JUN", "JUL", "AGU", "SEP", "OKT", "NOV", "DES"];
@@ -201,6 +217,8 @@ const STAT = [
   { id: "S3", label: "Lulusan S2 (cari S3)", target: "S3", lulus: true },
 ];
 let view: Route = "beranda", mode: "biasa" | "layak" = "biasa", eligRun = false;
+// Kategori lomba aktif di halaman Info Lomba. "Semua" = tanpa penyaringan.
+let kat: "Semua" | Kat = "Semua";
 let detail: Item | null = null;
 const YEAR0 = yearWib();
 const st: Filter = { q: "", jenis: new Set(), tingkat: new Set(), jenjang: new Set(), bidang: new Set(), status: new Set(), only: new Set(), year: YEAR0, month: 0 };
@@ -214,10 +232,14 @@ function cta(x: Item, ss: StInfo, label: string, alt: string): HTMLElement {
   if (ss.s === "ditutup") return h("span", { class: "btn dis", "aria-disabled": "true", title: "Pendaftaran periode ini sudah ditutup" }, "Pendaftaran ditutup");
   return h("a", { class: "btn main", href: linkOf(x), target: "_blank", rel: "noopener noreferrer" }, x.u ? label : alt);
 }
+// Label kategori lomba. Kosong untuk beasiswa.
+const katTag = (x: Item): HTMLElement | null => x.k
+  ? h("span", { class: "tag kat " + (x.k === "Akademik" ? "ak" : "nak") }, x.k)
+  : null;
 function card(x: Item, why: Why[] = []): HTMLElement {
   const on = saved.has(x.n), k = x.j.toLowerCase(), ss = statusOf(x);
   return h("article", { class: "card " + k + (ss.s === "ditutup" ? " closed" : "") },
-    h("div", { class: "tags" }, h("span", { class: "st " + ss.s }, STLABEL[ss.s]), h("span", { class: "tag " + k }, x.j), h("span", { class: "tag" }, x.t), h("span", { class: "tag" }, x.b), x.jen ? h("span", { class: "tag" }, x.jen) : null),
+    h("div", { class: "tags" }, h("span", { class: "st " + ss.s }, STLABEL[ss.s]), h("span", { class: "tag " + k }, x.j), katTag(x), h("span", { class: "tag" }, x.t), h("span", { class: "tag" }, x.b), x.jen ? h("span", { class: "tag" }, x.jen) : null),
     h("h3", {}, h("a", { href: "#item/" + slugOf(x.n) }, x.n)), h("p", { class: "org" }, x.o), h("p", { class: "desc" }, x.d),
     why.length ? h("ul", { class: "why" }, ...why.map(w => h("li", { class: w.v }, w.t))) : null,
     ss.s === "ditutup" ? h("p", { class: "closedn" }, "Periode ini sudah lewat. Cek situs resmi untuk periode berikutnya.") : null,
@@ -232,11 +254,11 @@ function row(x: Item, why: Why[] = []): HTMLElement {
   const labels = x.jen ? x.jen.split("/") : [x.t === "Internasional" ? "INT" : x.t === "Nasional" ? "NAS" : "KMP"];
   return h("article", { class: "row" + (ss.s === "ditutup" ? " closed" : "") },
     h("div", { class: "rl" }, h("div", { class: "dots" }, ...labels.map(l => h("span", { class: "dot " + k }, l))),
-      h("div", { class: "dts" }, h("span", {}, "Mulai:"), h("span", {}, x.op ? fmtDate(x.op, false) : "-"), h("span", { class: "dlx " + ss.s }, "Deadline:"), h("span", { class: "dlx " + ss.s }, x.dl ? fmtDate(x.dl) : "Belum diverifikasi"))),
+      h("div", { class: "dts" }, h("span", {}, "Mulai:"), h("span", {}, x.op ? fmtDate(x.op, false) : "-"), h("span", { class: "dlx " + ss.s }, "Deadline:"), h("span", { class: "dlx " + ss.s }, x.dl ? fmtDate(x.dl) : "Belum ada"))),
     h("div", { class: "rr" },
       h("div", { class: "rt" }, h("a", { class: "rn", href: "#item/" + slugOf(x.n) }, x.n),
         h("button", { class: "bm" + (on ? " on" : ""), type: "button", "data-s": x.n, "aria-pressed": String(on), "aria-label": (on ? "Hapus dari tersimpan: " : "Simpan: ") + x.n }, icon("bookmark"))),
-      h("p", { class: "rs" }, x.o + " \u00b7 " + x.t + " \u00b7 " + x.b),
+      h("p", { class: "rs" }, x.o + " \u00b7 " + x.t + " \u00b7 " + x.b + (x.k ? " \u00b7 " + x.k : "")),
       h("p", { class: "rd" }, x.d),
       h("div", { class: "rb" }, h("span", { class: "st " + ss.s }, STLABEL[ss.s]), h("span", { class: "dt" + (ss.s === "segera" ? " hot" : "") }, dateInfo(x, ss)),
         cta(x, ss, "Buka portal resmi", "Cari info resmi (Google)")),
@@ -258,7 +280,9 @@ const SHORT: Record<Route, string> = { beranda: "Beranda", cari: "Cari", lomba: 
 const navLinks = ([["beranda", "Beranda"], ["cari", "Cari"], ["lomba", "Info Lomba"], ["beasiswa", "Info Beasiswa"], ["arsip", "Arsip"]] as [Route, string][]).map(([r, l]) =>
   h("a", { href: "#" + r, "aria-label": l }, h("span", { class: "lg", "aria-hidden": "true" }, l), h("span", { class: "sh", "aria-hidden": "true" }, SHORT[r])));
 const nav = h("nav", { class: "nav", "aria-label": "Menu utama" }, h("div", { class: "wrap nav-in" },
-  h("a", { class: "brand", href: "#beranda" }, h("span", { class: "badge sm" }, img(HM, "Logo HMTI")), h("span", { class: "bt" }, "Lomba & Beasiswa TI")),
+  h("a", { class: "brand", href: "#beranda", "aria-label": "Lomba & Beasiswa TI, Divisi " + DIV + ", HMTI FT-UMB" },
+    h("span", { class: "badge sm" }, img(HM, "Logo HMTI")),
+    h("span", { class: "bw" }, h("span", { class: "bt" }, "Lomba & Beasiswa TI"), h("small", { class: "bs" }, DIV))),
   h("div", { class: "links" }, ...navLinks)));
 
 // Beranda
@@ -271,7 +295,7 @@ const vBeranda = h("section", {},
   h("header", { class: "hero" }, h("div", { class: "gear", "aria-hidden": "true" }),
     h("div", { class: "wrap hero-in" },
       h("div", { class: "brands" }, h("span", { class: "badge" }, img(HM, "Logo HMTI FT-UMB")), h("span", { class: "pill" }, img(UM, "Logo Universitas Mercu Buana"))),
-      h("p", { class: "kicker" }, "Divisi PWK, HMTI FT-UMB"),
+      h("p", { class: "kicker" }, "Divisi " + DIV),
       h("h1", {}, "Lomba dan beasiswa untuk ", h("em", {}, "insinyur industri"), " masa depan"),
       h("p", { class: "sub" }, "Satu tempat untuk mencari lomba kampus, nasional, internasional, dan beasiswa dalam maupun luar negeri. Khusus anggota Teknik Industri."),
       hs,
@@ -283,6 +307,21 @@ const vBeranda = h("section", {},
 
 // Katalog + cek kelayakan
 const ptitle = h("h1"), pdesc = h("p");
+// Kategori lomba: tab cepat di halaman Info Lomba.
+const KATS: Array<{ v: "Semua" | Kat; l: string; t: string }> = [
+  { v: "Semua", l: "Semua kategori", t: "Tampilkan semua lomba" },
+  { v: "Akademik", l: "Akademik", t: "Kompetisi berbasis keilmuan, riset, atau karya tulis" },
+  { v: "Nonakademik", l: "Nonakademik", t: "Kompetisi keterampilan, kewirausahaan, atau minat-bakat" },
+];
+const katBtns = KATS.map(z => {
+  const b = h("button", { class: "kt", type: "button", title: z.t }, z.l);
+  b.addEventListener("click", () => { kat = z.v; paint(); });
+  return b;
+});
+const katBar = h("div", { class: "kattabs", role: "group", "aria-label": "Kategori lomba" },
+  h("span", { class: "fl" }, "Kategori"),
+  h("div", { class: "ktrow" }, ...katBtns),
+  h("span", { class: "ktnote" }, "Akademik: keilmuan, riset, karya tulis. Nonakademik: keterampilan, kewirausahaan, minat-bakat."));
 const q = input("q", { type: "search", placeholder: "Nama, penyelenggara, bidang\u2026" });
 const syncs: Array<() => void> = [];
 function checks(title: string, opts: [string, string][], set: Set<string>): HTMLElement {
@@ -337,6 +376,7 @@ const vCat = h("section", {},
   h("div", { class: "phead" }, h("div", { class: "wrap" }, ptitle, pdesc)),
   h("div", { class: "band" }),
   h("div", { class: "wrap" },
+    katBar,
     h("p", { class: "alert" }, "Versi awal. Baru sebagian info yang punya tenggat terverifikasi. Untuk yang belum, buka sumber resmi untuk jadwal dan syarat terbaru sebelum mendaftar."),
     tabs, fToggle, h("div", { class: "layout" }, side, h("div", {}, resBiasa, resElig))));
 
@@ -370,6 +410,8 @@ function paintDetail(x: Item): void {
   dTitle.textContent = x.n;
   dSub.textContent = x.o + " \u00b7 " + x.t + " \u00b7 " + x.b;
   const tags: (Node | null)[] = [h("span", { class: "st " + ss.s }, STLABEL[ss.s]), h("span", { class: "tag " + k }, x.j), h("span", { class: "tag" }, x.t), h("span", { class: "tag" }, x.b)];
+  const kt = katTag(x);
+  if (kt) tags.push(kt);
   if (x.jen) tags.push(h("span", { class: "tag" }, x.jen));
   dTags.replaceChildren(...(tags.filter(Boolean) as Node[]));
 
@@ -397,7 +439,7 @@ function paintDetail(x: Item): void {
     h("div", { class: "dsec" }, h("h2", {}, "Tentang"), h("p", {}, x.d)),
     h("div", { class: "dsec" }, h("h2", {}, "Jadwal"), h("ul", {}, ...jadwal)),
     h("div", { class: "dsec" }, h("h2", {}, "Syarat indikatif"),
-      sy.length ? h("ul", {}, ...sy.map(t => h("li", {}, t))) : h("p", {}, "Syarat rinci belum diinput PWK. Buka pedoman resmi penyelenggara."),
+      sy.length ? h("ul", {}, ...sy.map(t => h("li", {}, t))) : h("p", {}, "Syarat rinci belum diisi pengurus divisi. Buka pedoman resmi penyelenggara."),
       h("p", { class: "dt" }, "Syarat bisa berubah tiap periode. Cocokkan lagi dengan pedoman resmi sebelum mendaftar.")),
     rel.length ? h("div", { class: "dsec" }, h("h2", {}, "Info terkait"), h("div", { class: "drel" }, ...rel.map(y => card(y)))) : h("div", {}));
 
@@ -411,14 +453,36 @@ function paintDetail(x: Item): void {
   dSide.replaceChildren(
     h("div", { class: "dfact" },
       ...fact("Penyelenggara", x.o), ...fact("Tingkat", x.t), ...fact("Bidang", x.b),
+      ...(x.k ? fact("Kategori", x.k) : []),
       ...fact("Tenggat", x.dl ? fmtDate(x.dl) : "Belum diumumkan"), ...fact("Jenis", x.j)),
     h("p", { class: "dt" + (ss.s === "segera" ? " hot" : "") }, dateInfo(x, ss)),
     h("div", { class: "dact" }, cta(x, ss, "Buka situs resmi", "Cari info resmi"), bm, ...cal),
     h("p", { class: "dt" }, "Selalu cek situs resmi penyelenggara sebelum mendaftar."));
 }
 
-const foot = h("footer", {}, h("div", { class: "wrap" }, h("span", { class: "badge" }, img(HM)), h("span", { class: "pill" }, img(UM)),
-  h("p", {}, "Divisi PWK, HMTI Fakultas Teknik, Universitas Mercu Buana. Data hanya penunjuk awal; selalu cek situs resmi penyelenggara. Data diperbarui " + fmtDate(UPDATED) + ".")));
+// Contact person di footer. Admin cukup mengubah nilai di objek ini.
+// Nomor telepon tidak dicantumkan karena belum ada data resmi.
+const CP = {
+  nama: "[Nama contact person]",   // placeholder sampai pengurus mengisi nama
+  jabatan: "Divisi " + DIV + ", HMTI FT-UMB",
+  ig: "hmti.umb",
+  email: "ardhayya03@gmail.com",
+};
+const footId = h("div", { class: "fid" },
+  h("div", { class: "flogos" }, h("span", { class: "badge" }, img(HM, "Logo HMTI")), h("span", { class: "pill" }, img(UM, "Logo Universitas Mercu Buana"))),
+  h("p", { class: "fdiv" }, "Divisi " + DIV),
+  h("p", { class: "fnote" }, "HMTI Fakultas Teknik, Universitas Mercu Buana. Data hanya penunjuk awal; selalu cek situs resmi penyelenggara."));
+const footCp = h("div", { class: "fcp" },
+  h("h2", {}, "CONTACT PERSON"),
+  h("p", { class: "cpn" }, CP.nama),
+  h("p", { class: "cpr" }, CP.jabatan),
+  h("ul", { class: "cpl" },
+    h("li", {}, h("a", { href: "mailto:" + CP.email }, icon("mail"), h("span", {}, CP.email))),
+    h("li", {}, h("a", { href: "https://www.instagram.com/" + CP.ig + "/", target: "_blank", rel: "noopener noreferrer" }, icon("ig"), h("span", {}, "@" + CP.ig)))));
+const footBot = h("div", { class: "fbot" },
+  h("span", {}, "Data diperbarui " + fmtDate(UPDATED)),
+  h("span", {}, "HMTI FT-UMB \u00b7 Divisi " + DIV));
+const foot = h("footer", {}, h("div", { class: "wrap" }, h("div", { class: "fgrid" }, footId, footCp), footBot));
 
 /* ---------- kelayakan beasiswa ---------- */
 function evaluate(x: Item, s: Student): { item: Item; v: Verdict; why: Why[] } {
@@ -426,7 +490,7 @@ function evaluate(x: Item, s: Student): { item: Item; v: Verdict; why: Why[] } {
   const why: Why[] = [];
   if (x.jen) why.push(x.jen.includes(a.target) ? { v: "ok", t: "Jenjang " + a.target + " sesuai" } : { v: "no", t: "Untuk jenjang " + x.jen });
   const r = x.req;
-  if (!r) why.push({ v: "cek", t: "Syarat belum diinput PWK, cek pedoman resmi" });
+  if (!r) why.push({ v: "cek", t: "Syarat belum diisi pengurus divisi, cek pedoman resmi" });
   else {
     if (r.lulusS1) why.push(a.lulus ? { v: "ok", t: "Sudah lulus S1" } : { v: "no", t: "Perlu ijazah S1" });
     if (r.ipkMin !== undefined) {
@@ -464,6 +528,8 @@ function paintCat(): void {
   tabs.hidden = view !== "cari"; tabBiasa.setAttribute("aria-pressed", String(!eligMode)); tabLayak.setAttribute("aria-pressed", String(eligMode));
   filterPanel.hidden = eligMode; eligPanel.hidden = !eligMode; resBiasa.hidden = eligMode; resElig.hidden = !eligMode;
   gJenis.hidden = view !== "cari";
+  katBar.hidden = view !== "lomba";
+  katBtns.forEach((b, i) => b.setAttribute("aria-pressed", String(KATS[i].v === kat)));
   if (eligMode) {
     mark(cStatus, v => sd.status === v); mark(cTujuan, v => sd.tujuan === v); mark(cBiaya, v => sd.biaya === (v === "ya"));
     semField.hidden = sd.status !== "S1"; paintElig(); return;
@@ -471,19 +537,23 @@ function paintCat(): void {
   syncs.forEach(f => f());
   const fj = fixedJenis(), ql = st.q.toLowerCase();
   const showExpired = Array.from(st.status).some(f => statusMatch(f, "ditutup"));
-  const pool = DATA.filter(x => (isLive(x) || showExpired) && (fj ? x.j === fj : st.jenis.size === 0 || st.jenis.has(x.j)));
+  // Kategori hanya menyaring lomba; beasiswa tidak punya kategori.
+  const kf = view === "lomba" ? kat : "Semua";
+  const pool = DATA.filter(x => (isLive(x) || showExpired)
+    && (fj ? x.j === fj : st.jenis.size === 0 || st.jenis.has(x.j))
+    && (kf === "Semua" || x.k === kf));
   const rows = pool.filter(x =>
     (st.tingkat.size === 0 || st.tingkat.has(x.t)) && (st.bidang.size === 0 || st.bidang.has(x.b)) &&
     (st.jenjang.size === 0 || Array.from(st.jenjang).some(j => (x.jen ?? "").includes(j))) &&
     (st.status.size === 0 || Array.from(st.status).some(f => statusMatch(f, statusOf(x).s))) &&
     (!st.only.has("saved") || saved.has(x.n)) && (st.month === 0 || inMonth(x, st.year, st.month)) &&
-    (!ql || (x.n + " " + x.o + " " + x.b + " " + x.d).toLowerCase().includes(ql))).sort(byStatus);
-  const jl = fj ?? (st.jenis.size === 1 ? Array.from(st.jenis)[0] : "Lomba & Beasiswa");
+    (!ql || (x.n + " " + x.o + " " + x.b + " " + x.d + " " + (x.k ?? "")).toLowerCase().includes(ql))).sort(byStatus);
+  const jl = (fj ?? (st.jenis.size === 1 ? Array.from(st.jenis)[0] : "Lomba & Beasiswa")) + (kf !== "Semua" ? " " + kf : "");
   yearLbl.textContent = String(st.year);
   mBtns.forEach((b, i) => b.setAttribute("aria-pressed", String(st.month === i)));
   mh.textContent = st.month === 0 ? jl + ", semua periode" : jl + " Bulan " + MONFULL[st.month - 1] + " " + st.year;
   count.textContent = rows.length + " dari " + pool.length + " info";
-  fillRows(list, rows, st.month !== 0 ? "Belum ada info bertanggal di bulan ini. Pilih SEMUA untuk melihat daftar lengkap." : st.tingkat.has("Kampus") && st.tingkat.size === 1 ? "Belum ada info tingkat kampus. PWK menambahkannya di daftar DATA." : "Tidak ada hasil. Ubah kata kunci atau reset filter.");
+  fillRows(list, rows, st.month !== 0 ? "Belum ada info bertanggal di bulan ini. Pilih SEMUA untuk melihat daftar lengkap." : st.tingkat.has("Kampus") && st.tingkat.size === 1 ? "Belum ada info tingkat kampus. Pengurus divisi menambahkannya di daftar DATA." : "Tidak ada hasil. Ubah kata kunci atau reset filter.");
 }
 function paintArsip(): void {
   mark(arcChips, v => arcJenis.has(v));
@@ -535,8 +605,10 @@ async function syncRemote(): Promise<void> {
     const body = await res.json() as { items?: Item[] };
     const items = Array.isArray(body.items) ? body.items : [];
     if (items.length < 1) return;
+    // API boleh belum mengirim kategori (item hasil pipeline); ambil dari bundel.
+    const katByName = new Map(DATA.map(x => [x.n, x.k]));
     DATA.length = 0;
-    DATA.push(...items);
+    DATA.push(...items.map(x => x.k || !katByName.get(x.n) ? x : { ...x, k: katByName.get(x.n) }));
     BYSLUG.clear();
     for (const x of DATA) BYSLUG.set(slugOf(x.n), x);
     BID.length = 0;
@@ -564,7 +636,7 @@ function init(): void {
     save("tiSaved", Array.from(saved)); paint();
   });
   q.addEventListener("input", () => { st.q = q.value; paint(); });
-  resetBtn.addEventListener("click", () => { for (const s of [st.jenis, st.tingkat, st.jenjang, st.bidang, st.status, st.only]) s.clear(); st.q = ""; q.value = ""; paint(); });
+  resetBtn.addEventListener("click", () => { for (const s of [st.jenis, st.tingkat, st.jenjang, st.bidang, st.status, st.only]) s.clear(); st.q = ""; q.value = ""; kat = "Semua"; paint(); });
   yPrev.addEventListener("click", () => { st.year = Math.max(YEAR0 - 2, st.year - 1); paint(); });
   yNext.addEventListener("click", () => { st.year = Math.min(YEAR0 + 3, st.year + 1); paint(); });
   hs.addEventListener("submit", e => { e.preventDefault(); st.q = hq.value.trim().slice(0, 100); q.value = st.q; mode = "biasa"; if (location.hash === "#cari") route(); else location.hash = "#cari"; });
