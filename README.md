@@ -42,7 +42,7 @@ Kategori tampil sebagai label di kartu, baris, dan halaman detail, serta bisa di
 
 ## Contact person
 
-Footer punya blok **CONTACT PERSON** yang datanya diatur di objek `CP` pada `src/app.ts` (nama, jabatan/divisi, `ig`, `email`). Email dirender sebagai tautan `mailto:` dan Instagram sebagai tautan keluar. Nomor telepon sengaja tidak dicantumkan karena belum ada data resmi; isi `nama` dengan nama pengurus yang bisa dihubungi.
+Footer punya blok **CONTACT PERSON** yang datanya diatur di objek `CP` pada `src/app.ts` (nama, jabatan/divisi, `ig`, `email`). Email dirender sebagai tautan `mailto:` dan Instagram sebagai tautan keluar. Nomor telepon sengaja tidak dicantumkan karena belum ada data resmi. Isi `nama` dengan nama pengurus yang bisa dihubungi; saat ini diisi nama himpunan.
 
 ## Nama divisi
 

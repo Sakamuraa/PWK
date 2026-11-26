@@ -168,7 +168,7 @@ const img = (src: string, alt = ""): HTMLImageElement => { const i = h("img", { 
 /* ---------- waktu & status tenggat ---------- */
 // Semua perhitungan memakai WIB (UTC+7). NOW diperbarui berkala supaya status
 // berpindah sendiri ke "ditutup" tanpa perlu admin mengubah data.
-const UPDATED = "2026-11-25";   // ubah setiap kali data diperbarui
+const UPDATED = "2026-11-26";   // ubah setiap kali data diperbarui
 const DAY = 86400000, WIB = 7 * 3600000;
 let NOW = Date.now();
 // Tahun berjalan menurut kalender WIB.
@@ -463,7 +463,7 @@ function paintDetail(x: Item): void {
 // Contact person di footer. Admin cukup mengubah nilai di objek ini.
 // Nomor telepon tidak dicantumkan karena belum ada data resmi.
 const CP = {
-  nama: "[Nama contact person]",   // placeholder sampai pengurus mengisi nama
+  nama: "HIMPUNAN MAHASISWA TEKNIK INDUSTRI",   // nama/nomor yang ditampilkan sebagai CP
   jabatan: "Divisi " + DIV + ", HMTI FT-UMB",
   ig: "hmti.umb",
   email: "ardhayya03@gmail.com",
