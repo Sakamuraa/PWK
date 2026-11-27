@@ -1,15 +1,20 @@
 {
   "name": "katalog-lomba-beasiswa-ti",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.21",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "bump": "node scripts/bump-version.mjs"
   },
   "devDependencies": {
     "typescript": "^5.7.3",
     "vite": "^6.0.7"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "pdf-parse": "^2.4.5"
   }
 }

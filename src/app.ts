@@ -1,5 +1,5 @@
 "use strict";
-// Katalog Lomba & Beasiswa TI - HMTI FT-UMB (Divisi Pengembangan Wawasan Keilmuan FT-UMB)
+// Katalog Lomba & Beasiswa TI - Divisi Pengembangan Wawasan Keilmuan HMTI FT-UMB
 // Seluruh tampilan dibangun dari kode ini. HTML hanya kerangka kosong (#app).
 // Tambah/ubah info lewat DATA dan REQ di bawah.
 
@@ -32,7 +32,7 @@ interface Why { v: Verdict; t: string }
 const HM = "/IMG_4190.PNG";
 const UM = "/LOGO UMB_WARNA OPSI 2.png";
 // Nama resmi divisi. Semua tampilan memakai nama lengkap, bukan singkatan.
-const DIV = "Pengembangan Wawasan Keilmuan FT-UMB";
+const DIV = "Pengembangan Wawasan Keilmuan";
 
 const DATA: Item[] = [
 {n:"PIMNAS (hasil PKM)",k:"Akademik",j:"Lomba",t:"Nasional",b:"Riset & Inovasi",o:"Kemdiktisaintek",d:"Pekan Ilmiah Mahasiswa Nasional untuk tim lolos pendanaan PKM.",tg:"PIMNAS ke-39: 2–7 Nov 2026 di UNDIP Semarang. Peserta dari tim PKM yang lolos pendanaan."},
@@ -366,13 +366,19 @@ const resElig = h("div", {});
 const tabBiasa = h("button", { class: "tab", type: "button" }, "Cari biasa"), tabLayak = h("button", { class: "tab", type: "button" }, "Cek kelayakan beasiswa");
 const tabs = h("div", { class: "tabs" }, tabBiasa, tabLayak);
 const side = h("aside", { class: "side", "aria-label": "Filter" }, filterPanel, eligPanel);
+const fToggle = h("button", { class: "ftoggle", type: "button", "aria-expanded": "false" },
+  icon("sliders"), h("span", {}, "Filter & kelayakan"));
+fToggle.addEventListener("click", () => {
+  const open = side.classList.toggle("open");
+  fToggle.setAttribute("aria-expanded", String(open));
+});
 const vCat = h("section", {},
   h("div", { class: "phead" }, h("div", { class: "wrap" }, ptitle, pdesc)),
   h("div", { class: "band" }),
   h("div", { class: "wrap" },
     katBar,
     h("p", { class: "alert" }, "Versi awal. Baru sebagian info yang punya tenggat terverifikasi. Untuk yang belum, buka sumber resmi untuk jadwal dan syarat terbaru sebelum mendaftar."),
-    tabs, h("div", { class: "layout" }, side, h("div", {}, resBiasa, resElig))));
+    tabs, fToggle, h("div", { class: "layout" }, side, h("div", {}, resBiasa, resElig))));
 
 // Arsip: isinya terbentuk sendiri dari info yang tenggatnya sudah lewat.
 const arcJenis = new Set<string>();
@@ -458,7 +464,7 @@ function paintDetail(x: Item): void {
 // Nomor telepon tidak dicantumkan karena belum ada data resmi.
 const CP = {
   nama: "HIMPUNAN MAHASISWA TEKNIK INDUSTRI",   // nama/nomor yang ditampilkan sebagai CP
-  jabatan: "Divisi " + DIV + ", HMTI FT-UMB",
+  jabatan: "Divisi " + DIV + " HMTI FT-UMB",
   ig: "hmti.umb",
   email: "ardhayya03@gmail.com",
 };
@@ -530,9 +536,12 @@ function paintCat(): void {
   }
   syncs.forEach(f => f());
   const fj = fixedJenis(), ql = st.q.toLowerCase();
+  const showExpired = Array.from(st.status).some(f => statusMatch(f, "ditutup"));
   // Kategori hanya menyaring lomba; beasiswa tidak punya kategori.
   const kf = view === "lomba" ? kat : "Semua";
-  const pool = DATA.filter(x => (fj ? x.j === fj : st.jenis.size === 0 || st.jenis.has(x.j)) && (kf === "Semua" || x.k === kf));
+  const pool = DATA.filter(x => (isLive(x) || showExpired)
+    && (fj ? x.j === fj : st.jenis.size === 0 || st.jenis.has(x.j))
+    && (kf === "Semua" || x.k === kf));
   const rows = pool.filter(x =>
     (st.tingkat.size === 0 || st.tingkat.has(x.t)) && (st.bidang.size === 0 || st.bidang.has(x.b)) &&
     (st.jenjang.size === 0 || Array.from(st.jenjang).some(j => (x.jen ?? "").includes(j))) &&
@@ -586,6 +595,28 @@ function route(): void {
   window.scrollTo(0, 0); paint();
 }
 
+/* ---------- data dari API ---------- */
+// Katalog utama datang dari /api/katalog (hasil pipeline). Kalau API tidak bisa
+// dihubungi, DATA yang dibundel tetap dipakai supaya situs jalan offline.
+async function syncRemote(): Promise<void> {
+  try {
+    const res = await fetch("/api/katalog", { headers: { accept: "application/json" } });
+    if (!res.ok) return;
+    const body = await res.json() as { items?: Item[] };
+    const items = Array.isArray(body.items) ? body.items : [];
+    if (items.length < 1) return;
+    // API boleh belum mengirim kategori (item hasil pipeline); ambil dari bundel.
+    const katByName = new Map(DATA.map(x => [x.n, x.k]));
+    DATA.length = 0;
+    DATA.push(...items.map(x => x.k || !katByName.get(x.n) ? x : { ...x, k: katByName.get(x.n) }));
+    BYSLUG.clear();
+    for (const x of DATA) BYSLUG.set(slugOf(x.n), x);
+    BID.length = 0;
+    for (const b of Array.from(new Set(DATA.map(x => x.b)))) BID.push(b);
+    route();
+  } catch { /* offline: bundel lokal */ }
+}
+
 /* ---------- init ---------- */
 function init(): void {
   document.documentElement.style.setProperty("--hmti", "url(" + HM + ")");
@@ -610,6 +641,7 @@ function init(): void {
   yNext.addEventListener("click", () => { st.year = Math.min(YEAR0 + 3, st.year + 1); paint(); });
   hs.addEventListener("submit", e => { e.preventDefault(); st.q = hq.value.trim().slice(0, 100); q.value = st.q; mode = "biasa"; if (location.hash === "#cari") route(); else location.hash = "#cari"; });
   window.addEventListener("hashchange", route);
+  void syncRemote();
   document.getElementById("app")!.replaceChildren(nav, h("main", {}, vBeranda, vCat, vArsip, vDetail), foot);
   route();
 
